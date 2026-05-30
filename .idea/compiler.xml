@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="api-gateway" />
+        <module name="eureka-service" />
+        <module name="config-server" />
+      </profile>
+      <profile name="Annotation profile for pago-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+        </processorPath>
+        <module name="pago-service" />
+      </profile>
+      <profile name="Annotation profile for vehiculo-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+        </processorPath>
+        <module name="vehiculo-service" />
+        <module name="sucursal-service" />
+        <module name="reportes-service" />
+        <module name="cliente-service" />
+        <module name="notificacion-service" />
+        <module name="mantencion-service" />
+        <module name="seguro-service" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="reserva-service" target="25" />
+      <module name="usuario-service" target="25" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
+      <module name="cliente-service" options="-parameters" />
+      <module name="config-server" options="-parameters" />
+      <module name="eureka-service" options="-parameters" />
+      <module name="mantencion-service" options="-parameters" />
+      <module name="notificacion-service" options="-parameters" />
+      <module name="pago-service" options="-parameters" />
+      <module name="reportes-service" options="-parameters" />
+      <module name="reserva-service" options="-parameters" />
+      <module name="seguro-service" options="-parameters" />
+      <module name="sucursal-service" options="-parameters" />
+      <module name="usuario-service" options="-parameters" />
+      <module name="vehiculo-service" options="-parameters" />
+    </option>
+  </component>
+</project>
