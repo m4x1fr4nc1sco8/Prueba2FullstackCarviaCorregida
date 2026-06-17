@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: mantencion-service
+
+  config:
+    import: ${SPRING_CONFIG_IMPORT}

@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: vehiculo-service
+
+  config:
+    import: ${SPRING_CONFIG_IMPORT}
