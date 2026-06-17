@@ -11,16 +11,6 @@
         <module name="eureka-service" />
         <module name="config-server" />
       </profile>
-      <profile name="Annotation profile for pago-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
-        </processorPath>
-        <module name="pago-service" />
-      </profile>
       <profile name="Annotation profile for vehiculo-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -31,6 +21,7 @@
         <module name="vehiculo-service" />
         <module name="sucursal-service" />
         <module name="reportes-service" />
+        <module name="pago-service" />
         <module name="cliente-service" />
         <module name="notificacion-service" />
         <module name="mantencion-service" />
