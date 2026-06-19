@@ -3,3 +3,7 @@ spring:
     name: api-gateway
   config:
     import: ${SPRING_CONFIG_IMPORT:configserver:http://localhost:8888}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
