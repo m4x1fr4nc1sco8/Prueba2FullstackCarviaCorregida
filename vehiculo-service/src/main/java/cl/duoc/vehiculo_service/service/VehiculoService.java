@@ -50,7 +50,6 @@ public class VehiculoService {
         return null;
     }
 
-    // ELIMINAR VEHICULO
     public void eliminarVehiculo(Long id) {
         vehiculoRepository.deleteById(id);
     }
