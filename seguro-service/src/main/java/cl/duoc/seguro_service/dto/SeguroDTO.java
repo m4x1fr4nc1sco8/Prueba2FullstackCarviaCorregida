@@ -1,5 +1,6 @@
 package cl.duoc.seguro_service.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -30,6 +31,17 @@ public class SeguroDTO {
     @NotBlank(message = "El estado del seguro es obligatorio")
     private String estadoSeguro;
 
+    @Schema(example = "1")
+    private Long id;
+
+    @Schema(example = "Premium")
+    private String tipoSeguro;
+
+    @Schema(example = "150000")
+    private Double costo;
+
+    @Schema(example = "2026-06-21")
+    private String fechaVencimiento;
 
     // GETTERS Y SETTERS
 

@@ -1,5 +1,6 @@
 package cl.duoc.notificacion_service.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -23,7 +24,14 @@ public class NotificacionDTO {
     private String estadoNotificacion;
 
 
-    // GETTERS Y SETTERS
+    @Schema(example = "Correo enviado correctamente")
+    private String mensajeString;
+
+    @Schema(example = "EMAIL")
+    private String tipo;
+
+    @Schema(example = "2026-06-21")
+    private String fecha;
 
     public Long getUsuarioId() {
         return usuarioId;

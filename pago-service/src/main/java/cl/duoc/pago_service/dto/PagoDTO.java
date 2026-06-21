@@ -1,5 +1,6 @@
 package cl.duoc.pago_service.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +27,18 @@ public class PagoDTO {
 
     @NotBlank(message = "El estado del pago es obligatorio")
     private String estadoPago;
+
+    @Schema(example = "25000")
+    private Double montoADouble;
+
+    @Schema(example = "2026-06-21")
+    private String fechaPagoString;
+
+    @Schema(example = "TRANSFERENCIA")
+    private String metodoPagoString;
+
+    @Schema(example = "COMPLETADO")
+    private String estado;
 
 
     // GETTERS Y SETTERS
