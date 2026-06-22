@@ -8,4 +8,4 @@ VALUES
     ( 'QRST90', 'Nissan', 'Versa', 2022, 'Gris', 'Sedan' ),
     ( 'UVWX11', 'Mazda', 'CX-5', 2024, 'Plateado', 'SUV' ),
     ( 'YZAB22', 'Suzuki', 'Swift', 2021, 'Rojo', 'Hatchback' ),
-    ( 'CDEF33', 'Ford', 'Ranger', 2023, 'Blanco', 'Camioneta' );'Camioneta');
+    ( 'CDEF33', 'Ford', 'Ranger', 2023, 'Blanco', 'Camioneta' );
