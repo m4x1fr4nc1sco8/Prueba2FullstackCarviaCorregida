@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
 @OpenAPIDefinition(
@@ -24,7 +27,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 				)
 		)
 )
-
+@EnableDiscoveryClient
+@EntityScan(basePackages = "cl.duoc.vehiculo_service.model")
+@EnableJpaRepositories(basePackages = "cl.duoc.vehiculo_service.repository")
 @SpringBootApplication
 public class VehiculoServiceApplication {
 
