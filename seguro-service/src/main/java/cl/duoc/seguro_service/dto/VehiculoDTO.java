@@ -1,8 +1,11 @@
-package cl.duoc.vehiculo_service.dto;
+package cl.duoc.seguro_service.dto;
 
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -22,4 +25,7 @@ public class VehiculoDTO {
     private String color;
 
     private String tipoVehiculo;
+
+    @Transient
+    private List<VehiculoDTO> vehiculos;
 }

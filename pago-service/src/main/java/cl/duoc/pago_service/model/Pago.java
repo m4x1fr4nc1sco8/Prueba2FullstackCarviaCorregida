@@ -1,11 +1,18 @@
 package cl.duoc.pago_service.model;
 
+import cl.duoc.pago_service.dto.ClienteDTO;
+import cl.duoc.pago_service.dto.ReservaDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,18 +25,32 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación lógica con reserva-service
+    @NotNull(message = "La reserva es obligatoria")
+    @Positive(message = "El id de la reserva debe ser mayor a 0")
     private Long reservaId;
 
-    // Relación lógica con usuario-service
-    private Long usuarioId;
+    @NotNull(message = "El cliente es obligatorio")
+    @Positive(message = "El id del cliente debe ser mayor a 0")
+    private Long clienteId;
 
+    @NotNull(message = "El monto es obligatorio")
+    @Positive(message = "El monto debe ser mayor a 0")
     private Double monto;
 
+    @NotNull(message = "La fecha de pago es obligatoria")
     private LocalDate fechaPago;
 
+    @NotBlank(message = "Debe indicar un metodo de pago")
+    @Size(max = 50, message = "El metodo de pago no puede superar 50 caracteres")
     private String metodoPago;
 
+    @NotBlank(message = "Debe indicar un estado de pago")
+    @Size(max = 30, message = "El estado del pago no puede superar 30 caracteres")
     private String estadoPago;
 
+    @Transient
+    private List<ReservaDTO> reservas;
+
+    @Transient
+    private List<ClienteDTO> clientes;
 }

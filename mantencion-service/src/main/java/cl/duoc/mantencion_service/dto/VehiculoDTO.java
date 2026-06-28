@@ -1,4 +1,4 @@
-package cl.duoc.vehiculo_service.dto;
+package cl.duoc.mantencion_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package cl.duoc.pago_service.dto;
+package cl.duoc.cliente_service.dto;
 
 import lombok.Data;
 

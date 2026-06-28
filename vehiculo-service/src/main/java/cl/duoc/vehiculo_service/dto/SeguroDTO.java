@@ -1,4 +1,4 @@
-package cl.duoc.seguro_service.dto;
+package cl.duoc.vehiculo_service.dto;
 
 import lombok.Data;
 

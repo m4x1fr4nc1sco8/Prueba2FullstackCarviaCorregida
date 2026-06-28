@@ -1,6 +1,5 @@
 package cl.duoc.mantencion_service.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,15 +28,7 @@ public class MantencionDTO {
     private String estadoMantencion;
 
 
-    @Schema(example = "Cambio de aceite")
-    private String descripcionString;
-
-    @Schema(example = "2026-06-21")
-    private String fecha;
-
-    @Schema(example = "150000")
-    private Double costoADouble;
-
+    // GETTERS Y SETTERS
 
     public Long getVehiculoId() {
         return vehiculoId;

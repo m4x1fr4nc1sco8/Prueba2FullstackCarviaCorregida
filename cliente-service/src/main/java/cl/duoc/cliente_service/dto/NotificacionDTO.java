@@ -1,4 +1,4 @@
-package cl.duoc.notificacion_service.dto;
+package cl.duoc.cliente_service.dto;
 
 import lombok.Data;
 
