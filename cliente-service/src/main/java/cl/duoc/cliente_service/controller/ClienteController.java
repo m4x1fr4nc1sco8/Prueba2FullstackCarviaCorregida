@@ -1,6 +1,7 @@
 package cl.duoc.cliente_service.controller;
 
 import cl.duoc.cliente_service.dto.ClienteDTO;
+import cl.duoc.cliente_service.exception.ClienteNotExistException;
 import cl.duoc.cliente_service.model.Cliente;
 import cl.duoc.cliente_service.service.ClienteService;
 
@@ -78,8 +79,16 @@ public class ClienteController {
             description = "Error interno del servidor"
     )
     @GetMapping("/{id}")
-    public Optional<Cliente> obtenerCliente(@PathVariable Long id) {
-        return clienteService.obtenerClientePorId(id);
+
+    public org.springframework.http.ResponseEntity<Cliente> obtenerCliente(@PathVariable Long id) {
+        try {
+
+            Cliente cliente = clienteService.obtenerClientePorId(id)
+                    .orElseThrow(() -> new ClienteNotExistException("Cliente no encontrado"));
+            return org.springframework.http.ResponseEntity.ok(cliente);
+        } catch (ClienteNotExistException e) {
+            return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(
@@ -102,7 +111,9 @@ public class ClienteController {
             responseCode = "500",
             description = "Error interno del servidor"
     )
+
     @PostMapping
+    @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
     public Cliente guardarCliente(@RequestBody Cliente cliente) {
         return clienteService.guardarCliente(cliente);
     }
@@ -144,6 +155,7 @@ public class ClienteController {
     }
 
     // ELIMINAR CLIENTE
+    @ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void eliminarCliente(@PathVariable Long id) {
         clienteService.eliminarCliente(id);
