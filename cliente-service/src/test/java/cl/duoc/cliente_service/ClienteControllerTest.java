@@ -88,4 +88,17 @@ class ClienteControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    @DisplayName("GET /api/v1/clientes/{id} - Debería retornar 404 NOT FOUND si el cliente no existe")
+    void testObtenerCliente_cuandoNoExiste_retorna404() throws Exception {
+        Long idInexistente = 99L;
+
+        // Simulamos que el servicio devuelve un Optional vacío (activando el .orElseThrow de tu controlador)
+        when(clienteService.obtenerClientePorId(idInexistente)).thenReturn(java.util.Optional.empty());
+
+        // Ejecutamos la petición GET y verificamos que el catch actúe devolviendo 404
+        mockMvc.perform(get("/api/v1/clientes/" + idInexistente))
+                .andExpect(status().isNotFound());
+    }
+
 }
