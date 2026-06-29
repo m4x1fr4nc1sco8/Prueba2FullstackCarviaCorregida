@@ -26,10 +26,8 @@ public class SeguroService {
 
     // Buscar seguro por ID
     public Seguro buscarSeguroPorId(Long id) {
-
-        Optional<Seguro> seguro = seguroRepository.findById(id);
-
-        return seguro.orElse(null);
+        return seguroRepository.findById(id)
+                .orElseThrow(() -> new cl.duoc.seguro_service.exception.SeguroNotExistException("Seguro no encontrado"));
     }
 
 

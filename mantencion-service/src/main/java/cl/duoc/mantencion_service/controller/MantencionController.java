@@ -76,8 +76,14 @@ public class MantencionController {
             description = "Error interno del servidor"
     )
     @GetMapping("/{id}")
-    public Mantencion obtenerMantencionPorId(@PathVariable Long id) {
-        return mantencionService.buscarMantencionPorId(id);
+    public org.springframework.http.ResponseEntity<Mantencion> obtenerMantencionPorId(@PathVariable Long id) {
+        try {
+            Mantencion mantencion = mantencionService.buscarMantencionPorId(id);
+            return org.springframework.http.ResponseEntity.ok(mantencion);
+        } catch (cl.duoc.mantencion_service.exception.MantencionNotExistException e) {
+
+            return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND).build();
+        }
     }
 
 
@@ -102,10 +108,10 @@ public class MantencionController {
             description = "Error interno del servidor"
     )
     @PostMapping
+    @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
     public Mantencion crearMantencion(@RequestBody Mantencion mantencion) {
         return mantencionService.guardarMantencion(mantencion);
     }
-
 
     @Operation(
             summary = "Eliminar mantención",
@@ -124,6 +130,7 @@ public class MantencionController {
             description = "Error interno del servidor"
     )
     @DeleteMapping("/{id}")
+    @ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
     public String eliminarMantencion(@PathVariable Long id) {
         return mantencionService.eliminarMantencion(id);
     }

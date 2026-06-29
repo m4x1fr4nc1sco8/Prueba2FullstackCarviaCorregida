@@ -26,10 +26,8 @@ public class NotificacionService {
 
     // Buscar notificación por ID
     public Notificacion buscarNotificacionPorId(Long id) {
-
-        Optional<Notificacion> notificacion = notificacionRepository.findById(id);
-
-        return notificacion.orElse(null);
+        return notificacionRepository.findById(id)
+                .orElseThrow(() -> new cl.duoc.notificacion_service.exception.NotificacionNotExistException("Notificación no encontrada"));
     }
 
 
@@ -46,5 +44,7 @@ public class NotificacionService {
 
         return "Notificación eliminada correctamente";
     }
+
+
 
 }

@@ -1,5 +1,6 @@
 package cl.duoc.seguro_service.controller;
 
+import cl.duoc.seguro_service.exception.SeguroNotExistException;
 import cl.duoc.seguro_service.model.Seguro;
 import cl.duoc.seguro_service.service.SeguroService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -78,12 +80,13 @@ public class SeguroController {
             description = "Error interno del servidor"
     )
     @GetMapping("/{id}")
-    public Seguro obtenerSeguroPorId(
-            @PathVariable Long id
-    ) {
-
-        return seguroService.buscarSeguroPorId(id);
-
+    public ResponseEntity<Seguro> obtenerSeguroPorId(@PathVariable Long id) {
+        try {
+            Seguro seguro = seguroService.buscarSeguroPorId(id);
+            return ResponseEntity.ok(seguro);
+        } catch (SeguroNotExistException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -72,11 +73,16 @@ public class VehiculoController {
             responseCode = "500",
             description = "Error interno del servidor"
     )
+
     @GetMapping("/{id}")
-    public Optional<Vehiculo> obtenerVehiculoPorId(
-            @PathVariable Long id
-    ) {
-        return vehiculoService.obtenerVehiculoPorId(id);
+    public ResponseEntity<Vehiculo> obtenerVehiculoPorId(@PathVariable Long id) {
+        try {
+            Vehiculo vehiculo = vehiculoService.obtenerVehiculoPorId(id)
+                    .orElseThrow(() -> new cl.duoc.vehiculo_service.exception.VehiculoNotExistException("Vehículo no encontrado"));
+            return ResponseEntity.ok(vehiculo);
+        } catch (cl.duoc.vehiculo_service.exception.VehiculoNotExistException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(

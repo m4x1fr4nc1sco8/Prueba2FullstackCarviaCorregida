@@ -24,12 +24,9 @@ public class MantencionService {
     }
 
 
-    // Buscar mantención por ID
     public Mantencion buscarMantencionPorId(Long id) {
-
-        Optional<Mantencion> mantencion = mantencionRepository.findById(id);
-
-        return mantencion.orElse(null);
+        return mantencionRepository.findById(id)
+                .orElseThrow(() -> new cl.duoc.mantencion_service.exception.MantencionNotExistException("Mantención no encontrada"));
     }
 
 

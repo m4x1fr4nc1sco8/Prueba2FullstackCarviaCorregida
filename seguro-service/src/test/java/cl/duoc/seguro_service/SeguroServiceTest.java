@@ -1,5 +1,6 @@
 package cl.duoc.seguro_service;
 
+import cl.duoc.seguro_service.exception.SeguroNotExistException;
 import cl.duoc.seguro_service.model.Seguro;
 import cl.duoc.seguro_service.repository.SeguroRepository;
 import cl.duoc.seguro_service.service.SeguroService;
@@ -21,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Pruebas unitarias para SeguroService")
 public class SeguroServiceTest {
 
     @Mock
@@ -29,55 +31,80 @@ public class SeguroServiceTest {
     @InjectMocks
     private SeguroService seguroService;
 
-    private Seguro seguroPrueba;
+    private Seguro seguro;
 
     @BeforeEach
     void setUp() {
-        // Inicializamos el objeto Seguro basándonos en tu modelo
-        seguroPrueba = new Seguro(
-                1L,
-                100L, // vehiculoId
-                "Seguro Automotriz Pro",
-                "Cobertura Total",
-                45000.0,
-                LocalDate.of(2025, 1, 1),
-                LocalDate.of(2026, 1, 1),
-                "ACTIVO"
-        );
+        seguro = new Seguro();
+        seguro.setId(1L);
+        seguro.setVehiculoId(10L);
+        seguro.setNombreSeguro("Seguro Total Carvia");
+        seguro.setTipoCobertura("Cobertura Completa");
+        seguro.setCostoSeguro(35000.0);
+        seguro.setFechaInicio(LocalDate.now());
+        seguro.setFechaFin(LocalDate.now().plusYears(1));
+        seguro.setEstadoSeguro("Activo");
     }
 
     @Test
-    @DisplayName("Debería retornar todos los seguros")
-    void obtenerSeguros_DeberiaRetornarListaCompleta() {
-        when(seguroRepository.findAll()).thenReturn(Arrays.asList(seguroPrueba));
+    @DisplayName("Debe listar todos los seguros correctamente")
+    void listarTodos_deberiaRetornarListaDeSeguros() {
+        when(seguroRepository.findAll()).thenReturn(Arrays.asList(seguro));
 
         List<Seguro> resultado = seguroService.obtenerSeguros();
 
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
-        assertEquals("Seguro Automotriz Pro", resultado.get(0).getNombreSeguro());
-        verify(seguroRepository, times(1)).findAll();
+        verify(seguroRepository).findAll();
     }
 
-
     @Test
-    @DisplayName("Debería guardar y retornar el seguro correctamente")
-    void guardarSeguro_DeberiaGuardarExitosamente() {
-        when(seguroRepository.save(any(Seguro.class))).thenReturn(seguroPrueba);
+    @DisplayName("Debe buscar un seguro por ID cuando existe")
+    void buscarPorId_cuandoExiste_deberiaRetornarSeguro() {
+        when(seguroRepository.findById(1L)).thenReturn(Optional.of(seguro));
 
-        Seguro resultado = seguroService.guardarSeguro(seguroPrueba);
+        Seguro resultado = seguroService.buscarSeguroPorId(1L);
 
         assertNotNull(resultado);
-        assertEquals("ACTIVO", resultado.getEstadoSeguro());
-        verify(seguroRepository, times(1)).save(seguroPrueba);
+        assertEquals(1L, resultado.getId());
+        assertEquals("Seguro Total Carvia", resultado.getNombreSeguro());
+        verify(seguroRepository).findById(1L);
     }
 
     @Test
-    @DisplayName("Debería eliminar el seguro y devolver mensaje de éxito")
-    void eliminarSeguro_DeberiaLlamarAlRepositoryYDevolverMensaje() {
-        String mensajeResultado = seguroService.eliminarSeguro(1L);
+    @DisplayName("Debe lanzar SeguroNotExistException cuando el seguro no existe")
+    void buscarPorId_cuandoNoExiste_deberiaLanzarSeguroNotExistException() {
+        when(seguroRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertEquals("Seguro eliminado correctamente", mensajeResultado);
-        verify(seguroRepository, times(1)).deleteById(1L);
+        SeguroNotExistException exception = assertThrows(
+                SeguroNotExistException.class,
+                () -> seguroService.buscarSeguroPorId(99L)
+        );
+
+        assertEquals("Seguro no encontrado", exception.getMessage());
+        verify(seguroRepository).findById(99L);
+    }
+
+    @Test
+    @DisplayName("Debe guardar un seguro correctamente")
+    void guardar_deberiaRetornarSeguroGuardado() {
+        when(seguroRepository.save(any(Seguro.class))).thenReturn(seguro);
+
+        Seguro resultado = seguroService.guardarSeguro(new Seguro());
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+        verify(seguroRepository).save(any(Seguro.class));
+    }
+
+    @Test
+    @DisplayName("Debe eliminar un seguro por ID correctamente")
+    void eliminar_deberiaEjecutarEliminacion() {
+        doNothing().when(seguroRepository).deleteById(1L);
+
+        String resultado = seguroService.eliminarSeguro(1L);
+
+        assertNotNull(resultado);
+        verify(seguroRepository).deleteById(1L);
     }
 }

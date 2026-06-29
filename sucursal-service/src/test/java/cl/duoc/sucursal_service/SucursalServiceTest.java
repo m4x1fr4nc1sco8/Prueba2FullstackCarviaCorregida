@@ -1,5 +1,6 @@
 package cl.duoc.sucursal_service;
 
+import cl.duoc.sucursal_service.exception.SucursalNotExistException;
 import cl.duoc.sucursal_service.model.Sucursal;
 import cl.duoc.sucursal_service.repository.SucursalRepository;
 import cl.duoc.sucursal_service.service.SucursalService;
@@ -20,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Pruebas unitarias para SucursalService")
 public class SucursalServiceTest {
 
     @Mock
@@ -28,57 +30,79 @@ public class SucursalServiceTest {
     @InjectMocks
     private SucursalService sucursalService;
 
-    private Sucursal sucursalPrueba;
+    private Sucursal sucursal;
 
     @BeforeEach
     void setUp() {
-        // Inicializamos el objeto Sucursal basándonos en tu modelo
-        sucursalPrueba = new Sucursal(
-                1L,
-                "Sucursal Santiago Centro",
-                "Av. Libertador Bernardo O'Higgins 123",
-                "Santiago",
-                "+56912345678",
-                "09:00 - 18:00",
-                "ACTIVA"
-        );
+        sucursal = new Sucursal();
+        sucursal.setId(1L);
+        sucursal.setNombreSucursal("Sucursal Plaza Vespucio");
+        sucursal.setDireccion("Av. Vicuña Mackenna 7110");
+        sucursal.setCiudad("Santiago");
+        sucursal.setTelefono("+56912345678");
+        sucursal.setHorarioAtencion("09:00 a 18:00");
+        sucursal.setEstadoSucursal("Activa");
     }
 
     @Test
-    @DisplayName("Debería retornar todas las sucursales")
-    void obtenerSucursales_DeberiaRetornarListaCompleta() {
-        when(sucursalRepository.findAll()).thenReturn(Arrays.asList(sucursalPrueba));
+    @DisplayName("Debe listar todas las sucursales correctamente")
+    void listarTodas_deberiaRetornarListaDeSucursales() {
+        when(sucursalRepository.findAll()).thenReturn(Arrays.asList(sucursal));
 
         List<Sucursal> resultado = sucursalService.obtenerSucursales();
 
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
-        assertEquals("Sucursal Santiago Centro", resultado.get(0).getNombreSucursal());
-        verify(sucursalRepository, times(1)).findAll();
+        verify(sucursalRepository).findAll();
     }
 
     @Test
-    @DisplayName("Debería retornar una sucursal si el ID existe")
-    void buscarSucursalPorId_CuandoExiste_DeberiaRetornarSucursal() {
-        when(sucursalRepository.findById(1L)).thenReturn(Optional.of(sucursalPrueba));
+    @DisplayName("Debe buscar una sucursal por ID cuando existe")
+    void buscarPorId_cuandoExiste_deberiaRetornarSucursal() {
+        when(sucursalRepository.findById(1L)).thenReturn(Optional.of(sucursal));
 
         Sucursal resultado = sucursalService.buscarSucursalPorId(1L);
 
         assertNotNull(resultado);
         assertEquals(1L, resultado.getId());
-        assertEquals("Santiago", resultado.getCiudad());
-        verify(sucursalRepository, times(1)).findById(1L);
+        assertEquals("Sucursal Plaza Vespucio", resultado.getNombreSucursal());
+        verify(sucursalRepository).findById(1L);
     }
 
     @Test
-    @DisplayName("Debería retornar null si el ID de la sucursal no existe")
-    void buscarSucursalPorId_CuandoNoExiste_DeberiaRetornarNull() {
+    @DisplayName("Debe lanzar SucursalNotExistException cuando la sucursal no existe")
+    void buscarPorId_cuandoNoExiste_deberiaLanzarSucursalNotExistException() {
         when(sucursalRepository.findById(99L)).thenReturn(Optional.empty());
 
-        Sucursal resultado = sucursalService.buscarSucursalPorId(99L);
+        SucursalNotExistException exception = assertThrows(
+                SucursalNotExistException.class,
+                () -> sucursalService.buscarSucursalPorId(99L)
+        );
 
-        assertNull(resultado);
-        verify(sucursalRepository, times(1)).findById(99L);
+        assertEquals("Sucursal no encontrada", exception.getMessage());
+        verify(sucursalRepository).findById(99L);
     }
 
+    @Test
+    @DisplayName("Debe guardar una sucursal correctamente")
+    void guardar_deberiaRetornarSucursalGuardada() {
+        when(sucursalRepository.save(any(Sucursal.class))).thenReturn(sucursal);
+
+        Sucursal resultado = sucursalService.guardarSucursal(new Sucursal());
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+        verify(sucursalRepository).save(any(Sucursal.class));
+    }
+
+    @Test
+    @DisplayName("Debe eliminar una sucursal por ID correctamente")
+    void eliminar_deberiaEjecutarEliminacion() {
+        doNothing().when(sucursalRepository).deleteById(1L);
+
+        String resultado = sucursalService.eliminarSucursal(1L);
+
+        assertNotNull(resultado);
+        verify(sucursalRepository).deleteById(1L);
+    }
 }

@@ -2,6 +2,7 @@ package cl.duoc.notificacion_service.controller;
 
 import cl.duoc.notificacion_service.model.Notificacion;
 import cl.duoc.notificacion_service.service.NotificacionService;
+import cl.duoc.notificacion_service.exception.NotificacionNotExistException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +19,6 @@ import java.util.List;
         name = "Notificaciones",
         description = "Operaciones disponibles para la gestión de notificaciones"
 )
-
 @RestController
 @RequestMapping("/api/v1/notificaciones")
 public class NotificacionController {
@@ -76,10 +77,13 @@ public class NotificacionController {
             description = "Error interno del servidor"
     )
     @GetMapping("/{id}")
-    public Notificacion obtenerNotificacionPorId(
-            @PathVariable Long id
-    ) {
-        return notificacionService.buscarNotificacionPorId(id);
+    public ResponseEntity<Notificacion> obtenerNotificacionPorId(@PathVariable Long id) {
+        try {
+            Notificacion notificacion = notificacionService.buscarNotificacionPorId(id);
+            return ResponseEntity.ok(notificacion);
+        } catch (NotificacionNotExistException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(
@@ -106,12 +110,9 @@ public class NotificacionController {
     )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Notificacion crearNotificacion(
-            @RequestBody Notificacion notificacion
-    ) {
+    public Notificacion crearNotificacion(@RequestBody Notificacion notificacion) {
         return notificacionService.guardarNotificacion(notificacion);
     }
-
 
     @Operation(
             summary = "Eliminar notificación",
@@ -131,10 +132,7 @@ public class NotificacionController {
     )
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public String eliminarNotificacion(
-            @PathVariable Long id
-    ) {
+    public String eliminarNotificacion(@PathVariable Long id) {
         return notificacionService.eliminarNotificacion(id);
     }
-
 }

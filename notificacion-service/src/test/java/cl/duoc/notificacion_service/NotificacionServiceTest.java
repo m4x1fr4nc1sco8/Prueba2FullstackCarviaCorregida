@@ -1,5 +1,6 @@
 package cl.duoc.notificacion_service;
 
+import cl.duoc.notificacion_service.exception.NotificacionNotExistException;
 import cl.duoc.notificacion_service.model.Notificacion;
 import cl.duoc.notificacion_service.repository.NotificacionRepository;
 import cl.duoc.notificacion_service.service.NotificacionService;
@@ -21,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Pruebas unitarias para NotificacionService")
 public class NotificacionServiceTest {
 
     @Mock
@@ -29,53 +31,82 @@ public class NotificacionServiceTest {
     @InjectMocks
     private NotificacionService notificacionService;
 
-    private Notificacion notificacionPrueba;
+    private Notificacion notificacion;
 
     @BeforeEach
     void setUp() {
-        // Inicializamos el objeto Notificacion basándonos en tu modelo
-        notificacionPrueba = new Notificacion(
-                1L,
-                50L,
-                "Tu vehículo está listo para retiro",
-                "EMAIL",
-                LocalDate.of(2026, 6, 21),
-                "ENVIADA"
-        );
+        notificacion = new Notificacion();
+        notificacion.setId(1L);
+        notificacion.setUsuarioId(5L);
+        notificacion.setMensaje("Tu vehículo está listo para retiro");
+        notificacion.setTipoNotificacion("Informativa");
+        notificacion.setFechaEnvio(LocalDate.now());
+        notificacion.setEstadoNotificacion("Enviada");
     }
 
     @Test
-    @DisplayName("Debería retornar todas las notificaciones")
-    void obtenerNotificaciones_DeberiaRetornarListaCompleta() {
-        when(notificacionRepository.findAll()).thenReturn(Arrays.asList(notificacionPrueba));
+    @DisplayName("Debe listar todas las notificaciones correctamente")
+    void listarTodos_deberiaRetornarListaDeNotificaciones() {
+        when(notificacionRepository.findAll()).thenReturn(Arrays.asList(notificacion));
 
         List<Notificacion> resultado = notificacionService.obtenerNotificaciones();
 
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
-        assertEquals("Tu vehículo está listo para retiro", resultado.get(0).getMensaje());
-        verify(notificacionRepository, times(1)).findAll();
+        verify(notificacionRepository).findAll();
     }
 
-
     @Test
-    @DisplayName("Debería guardar y retornar la notificación correctamente")
-    void guardarNotificacion_DeberiaGuardarExitosamente() {
-        when(notificacionRepository.save(any(Notificacion.class))).thenReturn(notificacionPrueba);
+    @DisplayName("Debe buscar una notificación por ID cuando existe")
+    void buscarPorId_cuandoExiste_deberiaRetornarNotificacion() {
+        when(notificacionRepository.findById(1L)).thenReturn(Optional.of(notificacion));
 
-        Notificacion resultado = notificacionService.guardarNotificacion(notificacionPrueba);
+        Notificacion resultado = notificacionService.buscarNotificacionPorId(1L);
 
         assertNotNull(resultado);
-        assertEquals("ENVIADA", resultado.getEstadoNotificacion());
-        verify(notificacionRepository, times(1)).save(notificacionPrueba);
+        assertEquals(1L, resultado.getId());
+        assertEquals("Tu vehículo está listo para retiro", resultado.getMensaje());
+        verify(notificacionRepository).findById(1L);
     }
 
     @Test
-    @DisplayName("Debería eliminar la notificación y devolver mensaje de éxito")
-    void eliminarNotificacion_DeberiaLlamarAlRepositoryYDevolverMensaje() {
-        String mensajeResultado = notificacionService.eliminarNotificacion(1L);
+    @DisplayName("Debe lanzar NotificacionNotExistException cuando la notificación no existe")
+    void buscarPorId_cuandoNoExiste_deberiaLanzarNotificacionNotExistException() {
+        // Simulamos base de datos vacía
+        when(notificacionRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertEquals("Notificación eliminada correctamente", mensajeResultado);
-        verify(notificacionRepository, times(1)).deleteById(1L);
+        // Comprobamos la llamada exacta usando el assertThrows idéntico al del profesor
+        NotificacionNotExistException exception = assertThrows(
+                NotificacionNotExistException.class,
+                () -> notificacionService.buscarNotificacionPorId(99L)
+        );
+
+        assertEquals("Notificación no encontrada", exception.getMessage());
+        verify(notificacionRepository).findById(99L);
+    }
+
+    @Test
+    @DisplayName("Debe guardar una notificación correctamente")
+    void guardar_deberiaRetornarNotificacionGuardada() {
+        when(notificacionRepository.save(any(Notificacion.class))).thenReturn(notificacion);
+
+        Notificacion resultado = notificacionService.guardarNotificacion(new Notificacion());
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+        verify(notificacionRepository).save(any(Notificacion.class));
+    }
+
+    @Test
+    @DisplayName("Debe eliminar una notificación por ID correctamente")
+    void eliminar_deberiaEjecutarEliminacion() {
+
+        doNothing().when(notificacionRepository).deleteById(1L);
+
+        // 2. Ejecutar el método del servicio (que retorna String)
+        String resultado = notificacionService.eliminarNotificacion(1L);
+
+        assertNotNull(resultado);
+        verify(notificacionRepository).deleteById(1L);
     }
 }

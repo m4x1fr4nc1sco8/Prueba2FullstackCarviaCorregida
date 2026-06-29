@@ -1,5 +1,6 @@
 package cl.duoc.sucursal_service.controller;
 
+import cl.duoc.sucursal_service.exception.SucursalNotExistException;
 import cl.duoc.sucursal_service.model.Sucursal;
 import cl.duoc.sucursal_service.service.SucursalService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -79,13 +81,15 @@ public class SucursalController {
             responseCode = "500",
             description = "Error interno del servidor"
     )
+
     @GetMapping("/{id}")
-    public Sucursal obtenerSucursalPorId(
-            @PathVariable Long id
-    ) {
-
-        return sucursalService.buscarSucursalPorId(id);
-
+    public ResponseEntity<Sucursal> obtenerSucursalPorId(@PathVariable Long id) {
+        try {
+            Sucursal sucursal = sucursalService.buscarSucursalPorId(id);
+            return ResponseEntity.ok(sucursal);
+        } catch (SucursalNotExistException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(

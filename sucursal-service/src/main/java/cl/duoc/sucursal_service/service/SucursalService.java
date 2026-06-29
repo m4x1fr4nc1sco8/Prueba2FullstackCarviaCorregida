@@ -26,10 +26,8 @@ public class SucursalService {
 
     // Buscar sucursal por ID
     public Sucursal buscarSucursalPorId(Long id) {
-
-        Optional<Sucursal> sucursal = sucursalRepository.findById(id);
-
-        return sucursal.orElse(null);
+        return sucursalRepository.findById(id)
+                .orElseThrow(() -> new cl.duoc.sucursal_service.exception.SucursalNotExistException("Sucursal no encontrada"));
     }
 
 

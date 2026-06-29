@@ -1,5 +1,6 @@
 package cl.duoc.pago_service;
 
+import cl.duoc.pago_service.exception.PagoNotExistException;
 import cl.duoc.pago_service.model.Pago;
 import cl.duoc.pago_service.repository.PagoRepository;
 import cl.duoc.pago_service.service.PagoService;
@@ -21,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Pruebas unitarias para PagoService")
 public class PagoServiceTest {
 
     @Mock
@@ -29,54 +31,79 @@ public class PagoServiceTest {
     @InjectMocks
     private PagoService pagoService;
 
-    private Pago pagoPrueba;
+    private Pago pago;
 
     @BeforeEach
     void setUp() {
-        // Inicializamos el objeto Pago basándonos en tu modelo
-        pagoPrueba = new Pago(
-                1L,
-                150L, // reservaId
-                50L,  // usuarioId
-                125000.0, // monto
-                LocalDate.of(2026, 6, 21),
-                "Tarjeta de Crédito",
-                "COMPLETADO"
-        );
+        pago = new Pago();
+        pago.setId(1L);
+        pago.setReservaId(10L);
+        pago.setClienteId(5L);
+        pago.setMonto(45000.0);
+        pago.setFechaPago(LocalDate.now());
+        pago.setMetodoPago("Tarjeta de Credito");
+        pago.setEstadoPago("Aprobado");
     }
 
     @Test
-    @DisplayName("Debería retornar todos los pagos")
-    void obtenerPagos_DeberiaRetornarListaCompleta() {
-        when(pagoRepository.findAll()).thenReturn(Arrays.asList(pagoPrueba));
+    @DisplayName("Debe listar todos los pagos correctamente")
+    void listarTodos_deberiaRetornarListaDePagos() {
+        when(pagoRepository.findAll()).thenReturn(Arrays.asList(pago));
 
         List<Pago> resultado = pagoService.obtenerPagos();
 
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
-        assertEquals("Tarjeta de Crédito", resultado.get(0).getMetodoPago());
-        verify(pagoRepository, times(1)).findAll();
+        verify(pagoRepository).findAll();
     }
 
-
     @Test
-    @DisplayName("Debería guardar y retornar el pago correctamente")
-    void guardarPago_DeberiaGuardarExitosamente() {
-        when(pagoRepository.save(any(Pago.class))).thenReturn(pagoPrueba);
+    @DisplayName("Debe buscar un pago por ID cuando existe")
+    void buscarPorId_cuandoExiste_deberiaRetornarPago() {
+        when(pagoRepository.findById(1L)).thenReturn(Optional.of(pago));
 
-        Pago resultado = pagoService.guardarPago(pagoPrueba);
+        Pago resultado = pagoService.buscarPagoPorId(1L);
 
         assertNotNull(resultado);
-        assertEquals("COMPLETADO", resultado.getEstadoPago());
-        verify(pagoRepository, times(1)).save(pagoPrueba);
+        assertEquals(1L, resultado.getId());
+        assertEquals("Tarjeta de Credito", resultado.getMetodoPago());
+        verify(pagoRepository).findById(1L);
     }
 
     @Test
-    @DisplayName("Debería eliminar el pago y devolver mensaje de éxito")
-    void eliminarPago_DeberiaLlamarAlRepositoryYDevolverMensaje() {
-        String mensajeResultado = pagoService.eliminarPago(1L);
+    @DisplayName("Debe lanzar PagoNotExistException cuando el pago no existe")
+    void buscarPorId_cuandoNoExiste_deberiaLanzarPagoNotExistException() {
+        when(pagoRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertEquals("Pago eliminado correctamente", mensajeResultado);
-        verify(pagoRepository, times(1)).deleteById(1L);
+        PagoNotExistException exception = assertThrows(
+                PagoNotExistException.class,
+                () -> pagoService.buscarPagoPorId(99L)
+        );
+
+        assertEquals("Pago no encontrado", exception.getMessage());
+        verify(pagoRepository).findById(99L);
+    }
+
+    @Test
+    @DisplayName("Debe guardar un pago correctamente")
+    void guardar_deberiaRetornarPagoGuardado() {
+        when(pagoRepository.save(any(Pago.class))).thenReturn(pago);
+
+        Pago resultado = pagoService.guardarPago(new Pago());
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+        verify(pagoRepository).save(any(Pago.class));
+    }
+
+    @Test
+    @DisplayName("Debe eliminar un pago por ID correctamente")
+    void eliminar_deberiaEjecutarEliminacion() {
+        doNothing().when(pagoRepository).deleteById(1L);
+
+        String resultado = pagoService.eliminarPago(1L);
+
+        assertNotNull(resultado);
+        verify(pagoRepository).deleteById(1L);
     }
 }

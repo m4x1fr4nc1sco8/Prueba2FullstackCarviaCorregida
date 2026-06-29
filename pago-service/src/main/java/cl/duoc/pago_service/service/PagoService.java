@@ -26,10 +26,8 @@ public class PagoService {
 
     // Buscar pago por ID
     public Pago buscarPagoPorId(Long id) {
-
-        Optional<Pago> pago = pagoRepository.findById(id);
-
-        return pago.orElse(null);
+        return pagoRepository.findById(id)
+                .orElseThrow(() -> new cl.duoc.pago_service.exception.PagoNotExistException("Pago no encontrado"));
     }
 
 

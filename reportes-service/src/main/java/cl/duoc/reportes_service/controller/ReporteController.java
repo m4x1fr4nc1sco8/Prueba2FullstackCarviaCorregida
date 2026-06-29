@@ -96,10 +96,13 @@ public class ReporteController {
             description = "Error interno del servidor"
     )
     @GetMapping("/vehiculos")
-    public List<VehiculoDTO> obtenerVehiculos() {
-
-        return vehiculoFeignClient.obtenerVehiculos();
-
+    public org.springframework.http.ResponseEntity<?> obtenerVehiculos() {
+        try {
+            List<VehiculoDTO> vehiculos = vehiculoFeignClient.obtenerVehiculos();
+            return org.springframework.http.ResponseEntity.ok(vehiculos);
+        } catch (feign.FeignException e) {
+            return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

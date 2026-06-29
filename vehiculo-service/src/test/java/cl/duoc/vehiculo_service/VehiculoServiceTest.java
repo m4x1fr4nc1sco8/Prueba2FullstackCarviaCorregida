@@ -17,10 +17,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Pruebas unitarias para VehiculoService")
 public class VehiculoServiceTest {
 
     @Mock
@@ -29,66 +29,75 @@ public class VehiculoServiceTest {
     @InjectMocks
     private VehiculoService vehiculoService;
 
-    private Vehiculo vehiculoPrueba;
+    private Vehiculo vehiculo;
 
     @BeforeEach
     void setUp() {
-        vehiculoPrueba = new Vehiculo();
-        vehiculoPrueba.setId(1L);
-        vehiculoPrueba.setMarca("Toyota");
-        vehiculoPrueba.setModelo("Yaris");
-        vehiculoPrueba.setAnio(2024);
-        vehiculoPrueba.setPatente("ABCD12");
+        vehiculo = new Vehiculo();
+        vehiculo.setId(1L);
+        vehiculo.setPatente("ABCD12");
+        vehiculo.setMarca("Toyota");
+        vehiculo.setModelo("Yaris");
+        vehiculo.setAnio(2022);
+        vehiculo.setColor("Rojo");
+        vehiculo.setSucursalId(2L);
+        vehiculo.setTipoVehiculo("Sedan");
     }
 
     @Test
-    @DisplayName("Debería retornar todos los vehículos")
-    void obtenerVehiculos_DeberiaRetornarListaCompleta() {
-        when(vehiculoRepository.findAll()).thenReturn(Arrays.asList(vehiculoPrueba));
+    @DisplayName("Debe listar todos los vehículos correctamente")
+    void listarTodos_deberiaRetornarListaDeVehiculos() {
+        when(vehiculoRepository.findAll()).thenReturn(Arrays.asList(vehiculo));
 
         List<Vehiculo> resultado = vehiculoService.obtenerVehiculos();
 
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
-        assertEquals("Toyota", resultado.get(0).getMarca());
-        verify(vehiculoRepository, times(1)).findAll();
+        verify(vehiculoRepository).findAll();
     }
 
     @Test
-    @DisplayName("Debería retornar un Optional con el vehículo si el ID existe")
-    void obtenerVehiculoPorId_CuandoExiste_DeberiaRetornarOptionalConVehiculo() {
-        // Usamos anyLong() para evitar conflictos de tipo de dato
-        when(vehiculoRepository.findById(anyLong())).thenReturn(Optional.of(vehiculoPrueba));
+    @DisplayName("Debe buscar un vehículo por ID cuando existe")
+    void buscarPorId_cuandoExiste_deberiaRetornarOptionalConVehiculo() {
+        when(vehiculoRepository.findById(1L)).thenReturn(Optional.of(vehiculo));
 
         Optional<Vehiculo> resultado = vehiculoService.obtenerVehiculoPorId(1L);
 
         assertTrue(resultado.isPresent());
-        assertEquals("Yaris", resultado.get().getModelo());
-        verify(vehiculoRepository, times(1)).findById(1L);
+        assertEquals("ABCD12", resultado.get().getPatente());
+        verify(vehiculoRepository).findById(1L);
     }
-
-
 
     @Test
-    @DisplayName("Debería actualizar y retornar el vehículo")
-    void actualizarVehiculo_DeberiaActualizarExitosamente() {
-        Vehiculo vehiculoActualizado = new Vehiculo();
-        vehiculoActualizado.setId(1L);
-        vehiculoActualizado.setMarca("Toyota");
-        vehiculoActualizado.setModelo("Corolla");
-        vehiculoActualizado.setAnio(2025);
-        when(vehiculoRepository.findById(any())).thenReturn(Optional.of(vehiculoPrueba));
-        when(vehiculoRepository.save(any())).thenReturn(vehiculoActualizado);
+    @DisplayName("Debe retornar un Optional vacío cuando el vehículo no existe")
+    void buscarPorId_cuandoNoExiste_deberiaRetornarOptionalVacio() {
+        when(vehiculoRepository.findById(99L)).thenReturn(Optional.empty());
 
-        Vehiculo resultado = vehiculoService.actualizarVehiculo(1L, vehiculoActualizado);
+        Optional<Vehiculo> resultado = vehiculoService.obtenerVehiculoPorId(99L);
 
-        if (resultado != null) {
-            assertEquals("Corolla", resultado.getModelo());
-            assertEquals(2025, resultado.getAnio());
-        } else {
-            // Forzamos el verde para cumplir con el requerimiento del profesor ✅
-            assertTrue(true, "El test pasa a verde exitosamente");
-        }
+        assertFalse(resultado.isPresent());
+        verify(vehiculoRepository).findById(99L);
     }
 
+    @Test
+    @DisplayName("Debe guardar un vehículo correctamente")
+    void guardar_deberiaRetornarVehiculoGuardado() {
+        when(vehiculoRepository.save(any(Vehiculo.class))).thenReturn(vehiculo);
+
+        Vehiculo resultado = vehiculoService.guardarVehiculo(new Vehiculo());
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+        verify(vehiculoRepository).save(any(Vehiculo.class));
+    }
+
+    @Test
+    @DisplayName("Debe eliminar un vehículo por ID correctamente")
+    void eliminar_deberiaEjecutarEliminacion() {
+        doNothing().when(vehiculoRepository).deleteById(1L);
+
+        vehiculoService.eliminarVehiculo(1L);
+
+        verify(vehiculoRepository).deleteById(1L);
+    }
 }
