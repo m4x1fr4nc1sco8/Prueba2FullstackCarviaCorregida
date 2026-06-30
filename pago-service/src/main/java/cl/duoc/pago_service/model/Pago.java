@@ -1,6 +1,7 @@
 package cl.duoc.pago_service.model;
 
 import cl.duoc.pago_service.dto.ClienteDTO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +23,7 @@ public class Pago {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY, description = "ID autogenerado por la base de datos")
     private Long id;
 
     @NotNull(message = "La reserva es obligatoria")

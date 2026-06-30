@@ -1,6 +1,7 @@
 package cl.duoc.cliente_service.model;
 
 import cl.duoc.cliente_service.dto.NotificacionDTO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import cl.duoc.cliente_service.dto.PagoDTO;
 import java.util.List;
-
 
 @Entity
 @Data
@@ -18,6 +18,7 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY, description = "ID autogenerado por la base de datos")
     private Long id;
 
     @NotBlank(message = "Nombre no puede estar vacio.")

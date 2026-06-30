@@ -3,8 +3,10 @@ package cl.duoc.cliente_service.service;
 import cl.duoc.cliente_service.model.Cliente;
 import cl.duoc.cliente_service.repository.ClienteRepository;
 import cl.duoc.cliente_service.feign.PagoFeignClient;
-import cl.duoc.cliente_service.feign.NotificacionFeignClient; // <-- Corregido con el nombre correcto de tu interfaz
+import cl.duoc.cliente_service.feign.NotificacionFeignClient;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,9 +15,8 @@ public class ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final PagoFeignClient pagoFeignClient;
-    private final NotificacionFeignClient notificacionFeignClient; // <-- Modificado con el nombre de clase correcto
+    private final NotificacionFeignClient notificacionFeignClient;
 
-    // Constructor limpio e inyectado correctamente
     public ClienteService(ClienteRepository clienteRepository,
                           PagoFeignClient pagoFeignClient,
                           NotificacionFeignClient notificacionFeignClient) {
@@ -25,7 +26,34 @@ public class ClienteService {
     }
 
     public List<Cliente> obtenerClientes() {
-        return clienteRepository.findAll();
+        List<Cliente> clientes = clienteRepository.findAll();
+
+        for (Cliente cliente : clientes) {
+
+            cliente.setPagos(new ArrayList<>());
+            cliente.setNotificaciones(new ArrayList<>());
+
+
+            try {
+                var pagos = pagoFeignClient.obtenerPagosPorClienteId(cliente.getId());
+                if (pagos != null) {
+                    cliente.setPagos(pagos);
+                }
+            } catch (Exception e) {
+
+            }
+
+            try {
+                var notificaciones = notificacionFeignClient.obtenerNotificacionesPorUsuarioId(cliente.getId());
+                if (notificaciones != null) {
+                    cliente.setNotificaciones(notificaciones);
+                }
+            } catch (Exception e) {
+                // Si falla el microservicio, se mantiene el arreglo vacío []
+            }
+        }
+
+        return clientes;
     }
 
     public Optional<Cliente> obtenerClientePorId(Long id) {
@@ -34,14 +62,12 @@ public class ClienteService {
         if (clienteOpt.isPresent()) {
             Cliente cliente = clienteOpt.get();
 
-            // 1. Llamada sincrónica a pagos
             try {
                 cliente.setPagos(pagoFeignClient.obtenerPagosPorClienteId(id));
             } catch (Exception e) {
                 cliente.setPagos(List.of());
             }
 
-            // 2. Llamada sincrónica a notificaciones
             try {
                 cliente.setNotificaciones(notificacionFeignClient.obtenerNotificacionesPorUsuarioId(id));
             } catch (Exception e) {
