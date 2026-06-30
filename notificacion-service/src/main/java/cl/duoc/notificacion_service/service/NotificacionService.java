@@ -46,5 +46,10 @@ public class NotificacionService {
     }
 
 
+    public List<Notificacion> obtenerNotificacionesPorUsuarioId(Long usuarioId) {
+        return notificacionRepository.findByUsuarioId(usuarioId);
+    }
+
+
 
 }

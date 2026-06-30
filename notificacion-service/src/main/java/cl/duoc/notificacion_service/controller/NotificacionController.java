@@ -1,9 +1,11 @@
 package cl.duoc.notificacion_service.controller;
 
+import cl.duoc.notificacion_service.exception.NotificacionNotExistException;
 import cl.duoc.notificacion_service.model.Notificacion;
 import cl.duoc.notificacion_service.service.NotificacionService;
-import cl.duoc.notificacion_service.exception.NotificacionNotExistException;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,20 +40,34 @@ public class NotificacionController {
             description = "Notificaciones listadas correctamente",
             content = @Content(
                     mediaType = "application/json",
-                    array = @ArraySchema(
-                            schema = @Schema(
-                                    implementation = Notificacion.class
-                            )
-                    )
+                    array = @ArraySchema(schema = @Schema(implementation = Notificacion.class))
             )
     )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping
-    public List<Notificacion> obtenerNotificaciones() {
-        return notificacionService.obtenerNotificaciones();
+    public ResponseEntity<List<Notificacion>> obtenerNotificaciones() {
+        List<Notificacion> notificaciones = notificacionService.obtenerNotificaciones();
+        return ResponseEntity.ok(notificaciones);
+    }
+
+    // <-- NUEVO ENDPOINT PARA EL PUNTO 2 (Sincrónico con Feign)
+    @Operation(
+            summary = "Obtener por Usuario ID",
+            description = "Obtiene todas las notificaciones enviadas a un usuario específico."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Notificaciones del usuario obtenidas con éxito",
+            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Notificacion.class)))
+    )
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<Notificacion>> obtenerNotificacionesPorUsuarioId(
+            @Parameter(description = "ID del usuario/cliente a consultar", example = "1")
+            @PathVariable Long usuarioId
+    ) {
+
+        List<Notificacion> notificaciones = notificacionService.obtenerNotificacionesPorUsuarioId(usuarioId);
+        return ResponseEntity.ok(notificaciones);
     }
 
     @Operation(
@@ -61,29 +77,20 @@ public class NotificacionController {
     @ApiResponse(
             responseCode = "200",
             description = "Notificación encontrada correctamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Notificacion.class
-                    )
-            )
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Notificacion.class))
     )
-    @ApiResponse(
-            responseCode = "404",
-            description = "Notificación no encontrada"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping("/{id}")
-    public ResponseEntity<Notificacion> obtenerNotificacionPorId(@PathVariable Long id) {
-        try {
-            Notificacion notificacion = notificacionService.buscarNotificacionPorId(id);
-            return ResponseEntity.ok(notificacion);
-        } catch (NotificacionNotExistException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    public ResponseEntity<Notificacion> obtenerNotificacionPorId(
+            @Parameter(description = "ID único de la notificación a buscar", example = "1")
+            @PathVariable Long id
+    ) {
+        Notificacion notificacion = notificacionService.buscarNotificacionPorId(id);
+        if (notificacion == null) {
+            throw new NotificacionNotExistException("Notificación no encontrada");
         }
+        return ResponseEntity.ok(notificacion);
     }
 
     @Operation(
@@ -93,46 +100,29 @@ public class NotificacionController {
     @ApiResponse(
             responseCode = "201",
             description = "Notificación creada correctamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Notificacion.class
-                    )
-            )
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Notificacion.class))
     )
-    @ApiResponse(
-            responseCode = "400",
-            description = "Datos inválidos"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Notificacion crearNotificacion(@RequestBody Notificacion notificacion) {
-        return notificacionService.guardarNotificacion(notificacion);
+    public ResponseEntity<Notificacion> crearNotificacion(@RequestBody Notificacion notificacion) {
+        Notificacion nuevaNotificacion = notificacionService.guardarNotificacion(notificacion);
+        return new ResponseEntity<>(nuevaNotificacion, HttpStatus.CREATED);
     }
 
     @Operation(
             summary = "Eliminar notificación",
             description = "Elimina una notificación mediante su ID."
     )
-    @ApiResponse(
-            responseCode = "204",
-            description = "Notificación eliminada correctamente"
-    )
-    @ApiResponse(
-            responseCode = "404",
-            description = "Notificación no encontrada"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "204", description = "Notificación eliminada correctamente")
+    @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public String eliminarNotificacion(@PathVariable Long id) {
-        return notificacionService.eliminarNotificacion(id);
+    public ResponseEntity<Void> eliminarNotificacion(
+            @Parameter(description = "ID de la notificación a eliminar", example = "1")
+            @PathVariable Long id
+    ) {
+        notificacionService.eliminarNotificacion(id);
+        return ResponseEntity.noContent().build();
     }
 }

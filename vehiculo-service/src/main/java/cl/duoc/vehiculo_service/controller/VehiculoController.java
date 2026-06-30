@@ -1,9 +1,11 @@
 package cl.duoc.vehiculo_service.controller;
 
+import cl.duoc.vehiculo_service.exception.VehiculoNotExistException;
 import cl.duoc.vehiculo_service.model.Vehiculo;
 import cl.duoc.vehiculo_service.service.VehiculoService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter; // <-- Importación para cumplir con el Punto 5
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,20 +17,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Tag(
         name = "Vehiculos",
         description = "Operaciones disponibles para la gestión de vehiculos"
 )
-
 @RestController
 @RequestMapping("/api/v1/vehiculos")
 public class VehiculoController {
 
     @Autowired
     private VehiculoService vehiculoService;
-
 
     @Operation(
             summary = "Listar vehículos",
@@ -39,18 +38,14 @@ public class VehiculoController {
             description = "Vehículos listados correctamente",
             content = @Content(
                     mediaType = "application/json",
-                    array = @ArraySchema(
-                            schema = @Schema(implementation = Vehiculo.class)
-                    )
+                    array = @ArraySchema(schema = @Schema(implementation = Vehiculo.class))
             )
     )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping
-    public List<Vehiculo> obtenerVehiculos() {
-        return vehiculoService.obtenerVehiculos();
+    public ResponseEntity<List<Vehiculo>> obtenerVehiculos() {
+        List<Vehiculo> vehiculos = vehiculoService.obtenerVehiculos();
+        return ResponseEntity.ok(vehiculos); // Retorna 200 OK explícito
     }
 
     @Operation(
@@ -60,29 +55,18 @@ public class VehiculoController {
     @ApiResponse(
             responseCode = "200",
             description = "Vehículo encontrado correctamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = Vehiculo.class)
-            )
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Vehiculo.class))
     )
-    @ApiResponse(
-            responseCode = "404",
-            description = "Vehículo no encontrado"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
-
+    @ApiResponse(responseCode = "404", description = "Vehículo no encontrado")
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping("/{id}")
-    public ResponseEntity<Vehiculo> obtenerVehiculoPorId(@PathVariable Long id) {
-        try {
-            Vehiculo vehiculo = vehiculoService.obtenerVehiculoPorId(id)
-                    .orElseThrow(() -> new cl.duoc.vehiculo_service.exception.VehiculoNotExistException("Vehículo no encontrado"));
-            return ResponseEntity.ok(vehiculo);
-        } catch (cl.duoc.vehiculo_service.exception.VehiculoNotExistException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<Vehiculo> obtenerVehiculoPorId(
+            @Parameter(description = "ID único del vehículo a buscar", example = "1") // <-- Exigencia Punto 5
+            @PathVariable Long id
+    ) {
+        Vehiculo vehiculo = vehiculoService.obtenerVehiculoPorId(id)
+                .orElseThrow(() -> new VehiculoNotExistException("Vehículo no encontrado"));
+        return ResponseEntity.ok(vehiculo); // Retorna 200 OK
     }
 
     @Operation(
@@ -92,86 +76,29 @@ public class VehiculoController {
     @ApiResponse(
             responseCode = "201",
             description = "Vehículo creado correctamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = Vehiculo.class)
-            )
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Vehiculo.class))
     )
-    @ApiResponse(
-            responseCode = "400",
-            description = "Datos inválidos"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Vehiculo guardarVehiculo(
-            @RequestBody Vehiculo vehiculo
-    ) {
-        return vehiculoService.guardarVehiculo(vehiculo);
+    public ResponseEntity<Vehiculo> guardarVehiculo(@RequestBody Vehiculo vehiculo) {
+        Vehiculo nuevoVehiculo = vehiculoService.guardarVehiculo(vehiculo);
+        return new ResponseEntity<>(nuevoVehiculo, HttpStatus.CREATED); // Retorna 201 Created explícito
     }
-
-
-    @Operation(
-            summary = "Actualizar vehículo",
-            description = "Actualiza la información de un vehículo existente."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Vehículo actualizado correctamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = Vehiculo.class)
-            )
-    )
-    @ApiResponse(
-            responseCode = "400",
-            description = "Datos inválidos"
-    )
-    @ApiResponse(
-            responseCode = "404",
-            description = "Vehículo no encontrado"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
-    @PutMapping("/{id}")
-    public Vehiculo actualizarVehiculo(
-            @PathVariable Long id,
-            @RequestBody Vehiculo vehiculoActualizado
-    ) {
-
-        return vehiculoService.actualizarVehiculo(id, vehiculoActualizado);
-
-    }
-
 
     @Operation(
             summary = "Eliminar vehículo",
             description = "Elimina un vehículo mediante su ID."
     )
-    @ApiResponse(
-            responseCode = "204",
-            description = "Vehículo eliminado correctamente"
-    )
-    @ApiResponse(
-            responseCode = "404",
-            description = "Vehículo no encontrado"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "204", description = "Vehículo eliminado correctamente")
+    @ApiResponse(responseCode = "404", description = "Vehículo no encontrado")
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminarVehiculo(
+    public ResponseEntity<Void> eliminarVehiculo(
+            @Parameter(description = "ID del vehículo a eliminar", example = "1") // <-- Exigencia Punto 5
             @PathVariable Long id
     ) {
-
         vehiculoService.eliminarVehiculo(id);
-
+        return ResponseEntity.noContent().build(); // Retorna 204 No Content real
     }
 }

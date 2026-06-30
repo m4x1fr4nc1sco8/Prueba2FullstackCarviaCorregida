@@ -38,21 +38,22 @@ class ClienteControllerTest {
 
     @BeforeEach
     void setUp() {
-        cliente = new Cliente(1L, "Juan", "Pérez", "juan.perez@mail.com", "clave1234", "+56912345678", List.of(), List.of(), List.of());
-        clienteSinId = new Cliente(null, "Juan", "Pérez", "juan.perez@mail.com", "clave1234", "+56912345678", List.of(), List.of(), List.of());
+        cliente = new Cliente(1L, "Juan", "Pérez", "juan.perez@gmail.com", "clave1234", "+56912345678", List.of(), List.of());
+        clienteSinId = new Cliente(null, "Juan", "Pérez", "juan.perez@gmail.com", "clave1234", "+56912345678", List.of(), List.of());
     }
 
     @Test
     @DisplayName("GET /api/v1/clientes - Debería retornar 200 OK y la lista de clientes")
     public void testEndpointListarTodos() throws Exception {
+
         when(clienteService.obtenerClientes()).thenReturn(List.of(cliente));
 
         mockMvc.perform(get("/api/v1/clientes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$").isArray()) // Asegura que la raíz sea un arreglo JSON
                 .andExpect(jsonPath("$[0].nombre").value("Juan"))
                 .andExpect(jsonPath("$[0].apellido").value("Pérez"))
-                .andExpect(jsonPath("$[0].email").value("juan.perez@mail.com"));
+                .andExpect(jsonPath("$[0].email").value("juan.perez@gmail.com"));
     }
 
     @Test

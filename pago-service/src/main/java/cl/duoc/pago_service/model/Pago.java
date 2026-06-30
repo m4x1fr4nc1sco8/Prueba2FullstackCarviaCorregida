@@ -1,7 +1,6 @@
 package cl.duoc.pago_service.model;
 
 import cl.duoc.pago_service.dto.ClienteDTO;
-import cl.duoc.pago_service.dto.ReservaDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,6 +30,7 @@ public class Pago {
 
     @NotNull(message = "El cliente es obligatorio")
     @Positive(message = "El id del cliente debe ser mayor a 0")
+    @Column(name = "usuario_id")
     private Long clienteId;
 
     @NotNull(message = "El monto es obligatorio")
@@ -47,9 +47,6 @@ public class Pago {
     @NotBlank(message = "Debe indicar un estado de pago")
     @Size(max = 30, message = "El estado del pago no puede superar 30 caracteres")
     private String estadoPago;
-
-    @Transient
-    private List<ReservaDTO> reservas;
 
     @Transient
     private List<ClienteDTO> clientes;

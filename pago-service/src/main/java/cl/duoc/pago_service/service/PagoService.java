@@ -45,4 +45,8 @@ public class PagoService {
         return "Pago eliminado correctamente";
     }
 
+    public List<Pago> obtenerPagosPorClienteId(Long clienteId) {
+        return pagoRepository.findByClienteId(clienteId);
+    }
+
 }

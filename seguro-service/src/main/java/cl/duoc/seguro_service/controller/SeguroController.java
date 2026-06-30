@@ -3,7 +3,9 @@ package cl.duoc.seguro_service.controller;
 import cl.duoc.seguro_service.exception.SeguroNotExistException;
 import cl.duoc.seguro_service.model.Seguro;
 import cl.duoc.seguro_service.service.SeguroService;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter; // <-- Importación para cumplir con el Punto 5
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +21,6 @@ import java.util.List;
         name = "Seguros",
         description = "Operaciones disponibles para la gestión de seguros"
 )
-
 @RestController
 @RequestMapping("/api/v1/seguros")
 public class SeguroController {
@@ -39,22 +40,14 @@ public class SeguroController {
             description = "Seguros listados correctamente",
             content = @Content(
                     mediaType = "application/json",
-                    array = @ArraySchema(
-                            schema = @Schema(
-                                    implementation = Seguro.class
-                            )
-                    )
+                    array = @ArraySchema(schema = @Schema(implementation = Seguro.class))
             )
     )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping
-    public List<Seguro> obtenerSeguros() {
-
-        return seguroService.obtenerSeguros();
-
+    public ResponseEntity<List<Seguro>> obtenerSeguros() {
+        List<Seguro> seguros = seguroService.obtenerSeguros();
+        return ResponseEntity.ok(seguros); // Retorna 200 OK explícito
     }
 
     @Operation(
@@ -64,29 +57,20 @@ public class SeguroController {
     @ApiResponse(
             responseCode = "200",
             description = "Seguro encontrado correctamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Seguro.class
-                    )
-            )
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Seguro.class))
     )
-    @ApiResponse(
-            responseCode = "404",
-            description = "Seguro no encontrado"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "404", description = "Seguro no encontrado")
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping("/{id}")
-    public ResponseEntity<Seguro> obtenerSeguroPorId(@PathVariable Long id) {
-        try {
-            Seguro seguro = seguroService.buscarSeguroPorId(id);
-            return ResponseEntity.ok(seguro);
-        } catch (SeguroNotExistException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    public ResponseEntity<Seguro> obtenerSeguroPorId(
+            @Parameter(description = "ID único del seguro a buscar", example = "1") // <-- Exigencia Punto 5
+            @PathVariable Long id
+    ) {
+        Seguro seguro = seguroService.buscarSeguroPorId(id);
+        if (seguro == null) {
+            throw new SeguroNotExistException("Seguro no encontrado");
         }
+        return ResponseEntity.ok(seguro); // Retorna 200 OK
     }
 
     @Operation(
@@ -96,29 +80,14 @@ public class SeguroController {
     @ApiResponse(
             responseCode = "201",
             description = "Seguro creado correctamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Seguro.class
-                    )
-            )
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Seguro.class))
     )
-    @ApiResponse(
-            responseCode = "400",
-            description = "Datos inválidos"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Seguro crearSeguro(
-            @RequestBody Seguro seguro
-    ) {
-
-        return seguroService.guardarSeguro(seguro);
-
+    public ResponseEntity<Seguro> crearSeguro(@RequestBody Seguro seguro) {
+        Seguro nuevoSeguro = seguroService.guardarSeguro(seguro);
+        return new ResponseEntity<>(nuevoSeguro, HttpStatus.CREATED); // Retorna 201 Created explícito
     }
 
     @Operation(
@@ -138,13 +107,11 @@ public class SeguroController {
             description = "Error interno del servidor"
     )
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public String eliminarSeguro(
+    public ResponseEntity<Void> eliminarSeguro(
+            @Parameter(description = "ID del seguro a eliminar", example = "1") // <-- Exigencia Punto 5
             @PathVariable Long id
     ) {
-
-        return seguroService.eliminarSeguro(id);
-
+        seguroService.eliminarSeguro(id);
+        return ResponseEntity.noContent().build(); // Retorna 204 No Content real
     }
-
 }

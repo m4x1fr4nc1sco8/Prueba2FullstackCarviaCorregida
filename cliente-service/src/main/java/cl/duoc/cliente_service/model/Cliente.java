@@ -1,7 +1,6 @@
 package cl.duoc.cliente_service.model;
 
 import cl.duoc.cliente_service.dto.NotificacionDTO;
-import cl.duoc.cliente_service.dto.ReservaDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -46,9 +45,6 @@ public class Cliente {
 
     @Transient
     private List<PagoDTO> pagos;
-
-    @Transient
-    private List<ReservaDTO> reservas;
 
     @Transient
     private List<NotificacionDTO> notificaciones;

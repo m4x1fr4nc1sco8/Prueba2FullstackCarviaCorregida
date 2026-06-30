@@ -41,7 +41,6 @@ public class ClienteServiceTest {
                 "clave1234",
                 "+56912345678",
                 List.of(),
-                List.of(),
                 List.of()
         );
     }

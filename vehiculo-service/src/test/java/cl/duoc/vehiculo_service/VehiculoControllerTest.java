@@ -104,17 +104,6 @@ public class VehiculoControllerTest {
                 .andExpect(jsonPath("$.id").value(1));
     }
 
-    @Test
-    @DisplayName("PUT /api/v1/vehiculos/{id} - Debería retornar 200 OK al actualizar")
-    void testEndpointActualizar() throws Exception {
-        when(vehiculoService.actualizarVehiculo(eq(1L), any(Vehiculo.class))).thenReturn(vehiculo);
-
-        mockMvc.perform(put("/api/v1/vehiculos/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vehiculo)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
-    }
 
     @Test
     @DisplayName("DELETE /api/v1/vehiculos/{id} - Debería retornar 204 NO CONTENT")

@@ -3,7 +3,9 @@ package cl.duoc.sucursal_service.controller;
 import cl.duoc.sucursal_service.exception.SucursalNotExistException;
 import cl.duoc.sucursal_service.model.Sucursal;
 import cl.duoc.sucursal_service.service.SucursalService;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter; // <-- Importación para cumplir con el Punto 5
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +21,6 @@ import java.util.List;
         name = "Sucursal",
         description = "Operaciones disponibles para la gestión de sucursales"
 )
-
 @RestController
 @RequestMapping("/api/v1/sucursales")
 public class SucursalController {
@@ -30,7 +31,6 @@ public class SucursalController {
         this.sucursalService = sucursalService;
     }
 
-
     @Operation(
             summary = "Listar sucursales",
             description = "Obtiene el listado completo de sucursales registradas."
@@ -40,24 +40,15 @@ public class SucursalController {
             description = "Sucursales listadas correctamente",
             content = @Content(
                     mediaType = "application/json",
-                    array = @ArraySchema(
-                            schema = @Schema(
-                                    implementation = Sucursal.class
-                            )
-                    )
+                    array = @ArraySchema(schema = @Schema(implementation = Sucursal.class))
             )
     )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping
-    public List<Sucursal> obtenerSucursales() {
-
-        return sucursalService.obtenerSucursales();
-
+    public ResponseEntity<List<Sucursal>> obtenerSucursales() {
+        List<Sucursal> sucursales = sucursalService.obtenerSucursales();
+        return ResponseEntity.ok(sucursales); // Retorna 200 OK explícito
     }
-
 
     @Operation(
             summary = "Obtener sucursal",
@@ -66,30 +57,20 @@ public class SucursalController {
     @ApiResponse(
             responseCode = "200",
             description = "Sucursal encontrada correctamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Sucursal.class
-                    )
-            )
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Sucursal.class))
     )
-    @ApiResponse(
-            responseCode = "404",
-            description = "Sucursal no encontrada"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
-
+    @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping("/{id}")
-    public ResponseEntity<Sucursal> obtenerSucursalPorId(@PathVariable Long id) {
-        try {
-            Sucursal sucursal = sucursalService.buscarSucursalPorId(id);
-            return ResponseEntity.ok(sucursal);
-        } catch (SucursalNotExistException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    public ResponseEntity<Sucursal> obtenerSucursalPorId(
+            @Parameter(description = "ID único de la sucursal a buscar", example = "1") // <-- Exigencia Punto 5
+            @PathVariable Long id
+    ) {
+        Sucursal sucursal = sucursalService.buscarSucursalPorId(id);
+        if (sucursal == null) {
+            throw new SucursalNotExistException("Sucursal no encontrada");
         }
+        return ResponseEntity.ok(sucursal); // Retorna 200 OK
     }
 
     @Operation(
@@ -99,29 +80,14 @@ public class SucursalController {
     @ApiResponse(
             responseCode = "201",
             description = "Sucursal creada correctamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Sucursal.class
-                    )
-            )
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Sucursal.class))
     )
-    @ApiResponse(
-            responseCode = "400",
-            description = "Datos inválidos"
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Sucursal crearSucursal(
-            @RequestBody Sucursal sucursal
-    ) {
-
-        return sucursalService.guardarSucursal(sucursal);
-
+    public ResponseEntity<Sucursal> crearSucursal(@RequestBody Sucursal sucursal) {
+        Sucursal nuevaSucursal = sucursalService.guardarSucursal(sucursal);
+        return new ResponseEntity<>(nuevaSucursal, HttpStatus.CREATED); // Retorna 201 Created explícito
     }
 
     @Operation(
@@ -137,17 +103,13 @@ public class SucursalController {
             description = "Sucursal no encontrada"
     )
     @ApiResponse(
-            responseCode = "500",
-            description = "Error interno del servidor"
-    )
+            responseCode = "500", description = "Error interno del servidor")
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public String eliminarSucursal(
+    public ResponseEntity<Void> eliminarSucursal(
+            @Parameter(description = "ID de la sucursal a eliminar", example = "1") // <-- Exigencia Punto 5
             @PathVariable Long id
     ) {
-
-        return sucursalService.eliminarSucursal(id);
-
+        sucursalService.eliminarSucursal(id);
+        return ResponseEntity.noContent().build(); // Retorna 204 No Content real
     }
-
 }
