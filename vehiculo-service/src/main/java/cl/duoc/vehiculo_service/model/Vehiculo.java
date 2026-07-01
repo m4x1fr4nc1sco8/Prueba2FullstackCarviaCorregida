@@ -3,6 +3,7 @@ package cl.duoc.vehiculo_service.model;
 
 import cl.duoc.vehiculo_service.dto.MantencionDTO;
 import cl.duoc.vehiculo_service.dto.SeguroDTO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class Vehiculo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY, description = "ID autogenerado por la base de datos")
     private Long id;
 
     @NotBlank(message = "La patente no puede estar vacia")

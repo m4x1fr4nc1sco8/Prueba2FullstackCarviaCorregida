@@ -106,4 +106,10 @@ public class MantencionController {
         mantencionService.eliminarMantencion(id);
         return ResponseEntity.noContent().build(); // Retorna 204 No Content real
     }
+
+    @GetMapping("/vehiculo/{vehiculoId}")
+    public ResponseEntity<List<Mantencion>> obtenerMantencionesPorVehiculoId(@PathVariable Long vehiculoId) {
+        List<Mantencion> mantenciones = mantencionService.obtenerMantencionesPorVehiculoId(vehiculoId);
+        return ResponseEntity.ok(mantenciones);
+    }
 }

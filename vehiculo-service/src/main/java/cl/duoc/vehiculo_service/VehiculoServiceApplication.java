@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
@@ -31,6 +32,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = "cl.duoc.vehiculo_service.model")
 @EnableJpaRepositories(basePackages = "cl.duoc.vehiculo_service.repository")
 @SpringBootApplication
+@EnableFeignClients
 public class VehiculoServiceApplication {
 
 	//aaaaaaa

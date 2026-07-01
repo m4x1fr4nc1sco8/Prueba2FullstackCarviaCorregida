@@ -44,4 +44,8 @@ public class MantencionService {
         return "Mantención eliminada correctamente";
     }
 
+    public List<Mantencion> obtenerMantencionesPorVehiculoId(Long vehiculoId) {
+        return mantencionRepository.findByVehiculoId(vehiculoId);
+    }
+
 }

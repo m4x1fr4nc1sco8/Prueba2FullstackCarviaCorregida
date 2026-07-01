@@ -101,4 +101,13 @@ public class VehiculoController {
         vehiculoService.eliminarVehiculo(id);
         return ResponseEntity.noContent().build(); // Retorna 204 No Content real
     }
+
+    @PutMapping("/{id}")
+    public org.springframework.http.ResponseEntity<cl.duoc.vehiculo_service.model.Vehiculo> actualizarVehiculo(@PathVariable Long id, @RequestBody cl.duoc.vehiculo_service.model.Vehiculo vehiculo) {
+        cl.duoc.vehiculo_service.model.Vehiculo vehiculoActualizado = vehiculoService.actualizarVehiculo(id, vehiculo);
+        if (vehiculoActualizado != null) {
+            return org.springframework.http.ResponseEntity.ok(vehiculoActualizado);
+        }
+        return org.springframework.http.ResponseEntity.notFound().build();
+    }
 }

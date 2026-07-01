@@ -1,6 +1,7 @@
 package cl.duoc.sucursal_service.model;
 
 import cl.duoc.sucursal_service.dto.VehiculoDTO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -20,6 +21,7 @@ public class Sucursal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY, description = "ID autogenerado por la base de datos")
     private Long id;
 
     @NotBlank(message = "El nombre de la sucursal no puede estar vacio")
