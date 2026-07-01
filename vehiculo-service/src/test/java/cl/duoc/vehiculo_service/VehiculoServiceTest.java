@@ -41,7 +41,7 @@ public class VehiculoServiceTest {
         vehiculo.setAnio(2022);
         vehiculo.setColor("Rojo");
         vehiculo.setSucursalId(2L);
-        vehiculo.setTipoVehiculo("Sedan");
+        vehiculo.setTipovehiculo("Sedan");
     }
 
     @Test

@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-// Corregimos el puerto a 9090 y quitamos 'path' para que no rompa la URL
-@FeignClient(name = "seguro-service", url = "http://localhost:9090/api/v1/seguros")
+
+@FeignClient(name = "seguro-service", path = "/api/v1/seguros")
 public interface SeguroFeignClient {
 
     @GetMapping("/vehiculo/{vehiculoId}")

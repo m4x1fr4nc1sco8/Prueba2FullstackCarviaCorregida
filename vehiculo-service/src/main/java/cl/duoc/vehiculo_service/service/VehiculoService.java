@@ -72,7 +72,7 @@ public class VehiculoService {
             vehiculo.setModelo(vehiculoActualizado.getModelo());
             vehiculo.setAnio(vehiculoActualizado.getAnio());
             vehiculo.setColor(vehiculoActualizado.getColor());
-            vehiculo.setTipoVehiculo(vehiculoActualizado.getTipoVehiculo());
+            vehiculo.setTipovehiculo(vehiculoActualizado.getTipovehiculo());
             vehiculo.setSucursalId(vehiculoActualizado.getSucursalId());
 
             return vehiculoRepository.save(vehiculo);

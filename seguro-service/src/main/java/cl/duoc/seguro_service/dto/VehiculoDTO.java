@@ -24,7 +24,7 @@ public class VehiculoDTO {
 
     private String color;
 
-    private String tipoVehiculo;
+    private String tipovehiculo;
 
     @Transient
     private List<VehiculoDTO> vehiculos;

@@ -49,7 +49,7 @@ public class VehiculoControllerTest {
         vehiculo.setAnio(2022);
         vehiculo.setColor("Rojo");
         vehiculo.setSucursalId(2L);
-        vehiculo.setTipoVehiculo("Sedan");
+        vehiculo.setTipovehiculo("Sedan");
 
         vehiculoSinId = new Vehiculo();
         vehiculoSinId.setPatente("ABCD12");
@@ -58,7 +58,7 @@ public class VehiculoControllerTest {
         vehiculoSinId.setAnio(2022);
         vehiculoSinId.setColor("Rojo");
         vehiculoSinId.setSucursalId(2L);
-        vehiculoSinId.setTipoVehiculo("Sedan");
+        vehiculoSinId.setTipovehiculo("Sedan");
     }
 
     @Test

@@ -114,4 +114,21 @@ public class SeguroController {
         seguroService.eliminarSeguro(id);
         return ResponseEntity.noContent().build(); // Retorna 204 No Content real
     }
+
+    @Operation(
+            summary = "Obtener seguro por ID de Vehículo",
+            description = "Busca el seguro asociado a un vehículo específico."
+    )
+    @ApiResponse(responseCode = "200", description = "Seguro encontrado")
+    @ApiResponse(responseCode = "404", description = "Seguro no encontrado para este vehículo")
+    @GetMapping("/vehiculo/{vehiculoId}")
+    public ResponseEntity<Seguro> obtenerSeguroPorVehiculoId(@PathVariable Long vehiculoId) {
+        // Buscamos en el service usando el método que filtra por auto
+        Seguro seguro = seguroService.buscarSeguroPorVehiculoId(vehiculoId);
+
+        if (seguro == null) {
+            return ResponseEntity.notFound().build(); // Retorna 404 limpio si no hay seguro
+        }
+        return ResponseEntity.ok(seguro); // Retorna 200 con el seguro encontrado
+    }
 }

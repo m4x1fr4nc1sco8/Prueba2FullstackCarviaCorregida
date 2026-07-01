@@ -59,7 +59,7 @@ public class Vehiculo {
     @Size(max = 30,
             message = "El tipo de vehiculo no puede superar los 30 caracteres")
     @Column(name = "tipo_vehiculo")
-    private String tipoVehiculo;
+    private String tipovehiculo;
 
     @Transient
     private SeguroDTO seguro;
