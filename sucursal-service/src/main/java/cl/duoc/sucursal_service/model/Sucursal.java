@@ -57,5 +57,6 @@ public class Sucursal {
     private String estadoSucursal;
 
     @Transient
+    @io.swagger.v3.oas.annotations.media.Schema(example = "[]", description = "Lista de vehículos de la sucursal")
     private List<VehiculoDTO> vehiculos;
 }

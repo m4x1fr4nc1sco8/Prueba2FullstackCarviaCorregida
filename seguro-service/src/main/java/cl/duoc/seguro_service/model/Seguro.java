@@ -26,6 +26,7 @@ public class Seguro {
 
     @NotNull(message = "El vehiculo es obligatorio")
     @Positive(message = "El id del vehiculo debe ser mayor a 0")
+    @io.swagger.v3.oas.annotations.media.Schema(example = "0", description = "ID del vehículo al cual pertenece este seguro")
     private Long vehiculoId;
 
     @NotBlank(message = "El nombre del seguro no puede estar vacio")
@@ -53,6 +54,9 @@ public class Seguro {
             message = "El estado del seguro no puede superar los 30 caracteres")
     private String estadoSeguro;
 
+
     @Transient
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"seguro", "vehiculos"}) // 🔥 AGREGA ESTO AQUÍ
     private List<VehiculoDTO> vehiculos;
+
 }

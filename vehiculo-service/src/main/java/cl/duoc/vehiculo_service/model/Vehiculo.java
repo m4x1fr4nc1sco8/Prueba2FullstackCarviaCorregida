@@ -53,6 +53,7 @@ public class Vehiculo {
 
     @NotNull(message = "La sucursal es obligatoria")
     @Positive(message = "El id de la sucursal debe ser mayor a 0")
+    @io.swagger.v3.oas.annotations.media.Schema(example = "0", description = "ID de la sucursal a la que pertenece el vehículo")
     private Long sucursalId;
 
     @NotBlank(message = "Debe indicar el tipo de vehiculo")
@@ -62,11 +63,15 @@ public class Vehiculo {
     private String tipovehiculo;
 
     @Transient
+    @io.swagger.v3.oas.annotations.media.Schema(hidden = true)
     private SeguroDTO seguro;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @Transient
+    @io.swagger.v3.oas.annotations.media.Schema(hidden = true)
     private List<MantencionDTO> mantenciones;
 
     @Transient
+    @io.swagger.v3.oas.annotations.media.Schema(hidden = true)
     private SucursalDTO sucursal;
 }
