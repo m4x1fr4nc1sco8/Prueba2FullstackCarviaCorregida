@@ -48,4 +48,8 @@ public class MantencionService {
         return mantencionRepository.findByVehiculoId(vehiculoId);
     }
 
+    public List<Mantencion> buscarPorTipo(String tipo) {
+        return mantencionRepository.findByTipoMantencionIgnoreCase(tipo);
+    }
+
 }

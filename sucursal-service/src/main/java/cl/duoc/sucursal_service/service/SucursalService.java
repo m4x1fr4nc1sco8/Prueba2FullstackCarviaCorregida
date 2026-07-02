@@ -45,4 +45,8 @@ public class SucursalService {
         return "Sucursal eliminada correctamente";
     }
 
+    public List<Sucursal> buscarPorEstado(String estado) {
+        return sucursalRepository.findByEstadoSucursalIgnoreCase(estado);
+    }
+
 }

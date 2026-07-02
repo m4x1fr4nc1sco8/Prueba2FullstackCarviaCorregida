@@ -50,6 +50,16 @@ public class NotificacionService {
         return notificacionRepository.findByUsuarioId(usuarioId);
     }
 
+    public List<Notificacion> buscarPorTipo(String tipo) {
+        return notificacionRepository.findByTipoNotificacionIgnoreCase(tipo);
+    }
+
+    public List<Notificacion> obtenerTodasNotificaciones() {
+        return notificacionRepository.findAll();
+    }
+
+
+
 
 
 }

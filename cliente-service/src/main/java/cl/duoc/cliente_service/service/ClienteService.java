@@ -98,4 +98,8 @@ public class ClienteService {
         }
         return null;
     }
+
+    public List<Cliente> buscarPorApellido(String apellido) {
+        return clienteRepository.findByApellidoContainingIgnoreCase(apellido);
+    }
 }

@@ -102,12 +102,21 @@ public class VehiculoController {
         return ResponseEntity.noContent().build(); // Retorna 204 No Content real
     }
 
-    @PutMapping("/{id}")
-    public org.springframework.http.ResponseEntity<cl.duoc.vehiculo_service.model.Vehiculo> actualizarVehiculo(@PathVariable Long id, @RequestBody cl.duoc.vehiculo_service.model.Vehiculo vehiculo) {
-        cl.duoc.vehiculo_service.model.Vehiculo vehiculoActualizado = vehiculoService.actualizarVehiculo(id, vehiculo);
-        if (vehiculoActualizado != null) {
-            return org.springframework.http.ResponseEntity.ok(vehiculoActualizado);
-        }
-        return org.springframework.http.ResponseEntity.notFound().build();
+    // --- ENDPOINT PERSONALIZADO PARA FILTRAR POR TIPO DE VEHÍCULO ---
+    @Operation(
+            summary = "Filtrar vehículos por tipo (Personalizado)",
+            description = "Endpoint personalizado para listar los vehículos filtrados por su tipo (ej: Sedan, SUV, Hatchback)."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Vehículos filtrados correctamente",
+            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Vehiculo.class)))
+    )
+    @GetMapping("/filtrar/tipo")
+    public ResponseEntity<List<Vehiculo>> filtrarPorTipo(
+            @Parameter(description = "Tipo de vehículo a filtrar", example = "Sedan")
+            @RequestParam String tipo
+    ) {
+        return ResponseEntity.ok(vehiculoService.buscarPorTipo(tipo));
     }
 }

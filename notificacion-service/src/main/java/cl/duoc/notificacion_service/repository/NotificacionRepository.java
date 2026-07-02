@@ -8,6 +8,8 @@ import java.util.List;
 @Repository
 public interface NotificacionRepository extends JpaRepository<Notificacion, Long> {
 
-    // Genera automáticamente la query: SELECT * FROM notificaciones WHERE usuario_id = ?
     List<Notificacion> findByUsuarioId(Long usuarioId);
+
+    List<Notificacion> findByTipoNotificacionIgnoreCase(String tipoNotificacion);
+
 }

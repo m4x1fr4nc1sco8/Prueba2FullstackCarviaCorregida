@@ -5,7 +5,7 @@ import cl.duoc.sucursal_service.model.Sucursal;
 import cl.duoc.sucursal_service.service.SucursalService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter; // <-- Importación para cumplir con el Punto 5
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -47,7 +47,7 @@ public class SucursalController {
     @GetMapping
     public ResponseEntity<List<Sucursal>> obtenerSucursales() {
         List<Sucursal> sucursales = sucursalService.obtenerSucursales();
-        return ResponseEntity.ok(sucursales); // Retorna 200 OK explícito
+        return ResponseEntity.ok(sucursales);
     }
 
     @Operation(
@@ -63,14 +63,14 @@ public class SucursalController {
     @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping("/{id}")
     public ResponseEntity<Sucursal> obtenerSucursalPorId(
-            @Parameter(description = "ID único de la sucursal a buscar", example = "1") // <-- Exigencia Punto 5
+            @Parameter(description = "ID único de la sucursal a buscar", example = "1")
             @PathVariable Long id
     ) {
         Sucursal sucursal = sucursalService.buscarSucursalPorId(id);
         if (sucursal == null) {
             throw new SucursalNotExistException("Sucursal no encontrada");
         }
-        return ResponseEntity.ok(sucursal); // Retorna 200 OK
+        return ResponseEntity.ok(sucursal);
     }
 
     @Operation(
@@ -87,7 +87,7 @@ public class SucursalController {
     @PostMapping
     public ResponseEntity<Sucursal> crearSucursal(@RequestBody Sucursal sucursal) {
         Sucursal nuevaSucursal = sucursalService.guardarSucursal(sucursal);
-        return new ResponseEntity<>(nuevaSucursal, HttpStatus.CREATED); // Retorna 201 Created explícito
+        return new ResponseEntity<>(nuevaSucursal, HttpStatus.CREATED);
     }
 
     @Operation(
@@ -106,10 +106,27 @@ public class SucursalController {
             responseCode = "500", description = "Error interno del servidor")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarSucursal(
-            @Parameter(description = "ID de la sucursal a eliminar", example = "1") // <-- Exigencia Punto 5
+            @Parameter(description = "ID de la sucursal a eliminar", example = "1")
             @PathVariable Long id
     ) {
         sucursalService.eliminarSucursal(id);
-        return ResponseEntity.noContent().build(); // Retorna 204 No Content real
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Filtrar sucursales por estado (Personalizado)",
+            description = "Endpoint personalizado para listar las sucursales filtradas por su estado actual (ej: Activa, Inactiva)."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Sucursales filtradas correctamente",
+            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Sucursal.class)))
+    )
+    @GetMapping("/filtrar/estado")
+    public ResponseEntity<List<Sucursal>> filtrarPorEstado(
+            @Parameter(description = "Estado de la sucursal a filtrar", example = "Activa")
+            @RequestParam String estado
+    ) {
+        return ResponseEntity.ok(sucursalService.buscarPorEstado(estado));
     }
 }

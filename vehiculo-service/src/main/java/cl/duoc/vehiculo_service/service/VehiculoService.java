@@ -126,4 +126,8 @@ public class VehiculoService {
             vehiculo.setMantenciones(new ArrayList<>());
         }
     }
+
+    public List<Vehiculo> buscarPorTipo(String tipo) {
+        return vehiculoRepository.findByTipovehiculoIgnoreCase(tipo);
+    }
 }

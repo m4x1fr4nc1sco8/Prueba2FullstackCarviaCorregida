@@ -9,4 +9,6 @@ import java.util.List;
 public interface MantencionRepository extends JpaRepository<Mantencion, Long> {
 
     List<Mantencion> findByVehiculoId(Long vehiculoId);
+
+    List<Mantencion> findByTipoMantencionIgnoreCase(String tipoMantencion);
 }

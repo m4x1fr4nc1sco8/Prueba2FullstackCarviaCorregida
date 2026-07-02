@@ -50,7 +50,7 @@ public class PagoController {
         return ResponseEntity.ok(pagos);
     }
 
-    // <-- NUEVO ENDPOINT PARA EL PUNTO 2 (Feign Client)
+    // <-- ENDPOINT OBLIGATORIO PARA EL FEIGN CLIENT
     @Operation(
             summary = "Obtener por Cliente ID",
             description = "Obtiene el historial de pagos asociados a un cliente específico."

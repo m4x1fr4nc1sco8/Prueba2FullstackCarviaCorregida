@@ -47,7 +47,7 @@ public class MantencionController {
     @GetMapping
     public ResponseEntity<List<Mantencion>> obtenerMantenciones() {
         List<Mantencion> mantenciones = mantencionService.obtenerMantenciones();
-        return ResponseEntity.ok(mantenciones); // Retorna 200 OK explícito
+        return ResponseEntity.ok(mantenciones);
     }
 
     @Operation(
@@ -63,15 +63,14 @@ public class MantencionController {
     @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping("/{id}")
     public ResponseEntity<Mantencion> obtenerMantencionPorId(
-            @Parameter(description = "ID único de la mantención", example = "1") // <-- Exigencia Punto 5
+            @Parameter(description = "ID único de la mantención a buscar (Ejemplo: 1 para Cambio de aceite)", example = "1")
             @PathVariable Long id
     ) {
-        // Asumiendo que tu Service maneja el Optional o lanza la excepción directamente, limpiamos el controlador
         Mantencion mantencion = mantencionService.buscarMantencionPorId(id);
         if (mantencion == null) {
             throw new MantencionNotExistException("Mantención no encontrada");
         }
-        return ResponseEntity.ok(mantencion); // Retorna 200 OK si existe
+        return ResponseEntity.ok(mantencion);
     }
 
     @Operation(
@@ -88,7 +87,7 @@ public class MantencionController {
     @PostMapping
     public ResponseEntity<Mantencion> crearMantencion(@RequestBody Mantencion mantencion) {
         Mantencion nuevaMantencion = mantencionService.guardarMantencion(mantencion);
-        return new ResponseEntity<>(nuevaMantencion, HttpStatus.CREATED); // Retorna 201 Created explícito
+        return new ResponseEntity<>(nuevaMantencion, HttpStatus.CREATED);
     }
 
     @Operation(
@@ -100,16 +99,22 @@ public class MantencionController {
     @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarMantencion(
-            @Parameter(description = "ID de la mantención a eliminar", example = "1") // <-- Exigencia Punto 5
+            @Parameter(description = "ID de la mantención a eliminar", example = "1")
             @PathVariable Long id
     ) {
         mantencionService.eliminarMantencion(id);
-        return ResponseEntity.noContent().build(); // Retorna 204 No Content real
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/vehiculo/{vehiculoId}")
-    public ResponseEntity<List<Mantencion>> obtenerMantencionesPorVehiculoId(@PathVariable Long vehiculoId) {
-        List<Mantencion> mantenciones = mantencionService.obtenerMantencionesPorVehiculoId(vehiculoId);
-        return ResponseEntity.ok(mantenciones);
+    @Operation(
+            summary = "Filtrar mantenciones por tipo (Personalizado)",
+            description = "Endpoint personalizado para listar mantenciones según su tipo (Preventiva o Correctiva)."
+    )
+    @GetMapping("/filtrar/tipo")
+    public ResponseEntity<List<Mantencion>> filtrarPorTipo(
+            @io.swagger.v3.oas.annotations.Parameter(description = "Tipo de mantención a filtrar", example = "Preventiva")
+            @RequestParam String tipo
+    ) {
+        return ResponseEntity.ok(mantencionService.buscarPorTipo(tipo));
     }
 }

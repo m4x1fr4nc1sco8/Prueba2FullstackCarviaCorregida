@@ -61,12 +61,12 @@ public class ClienteController {
     @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     @GetMapping("/{id}")
     public ResponseEntity<Cliente> obtenerCliente(
-            @Parameter(description = "ID único del cliente a buscar", example = "1")
+            @Parameter(description = "ID único del cliente a buscar (Ejemplo: 30 para Sofía)", example = "30")
             @PathVariable Long id
     ) {
         Cliente cliente = clienteService.obtenerClientePorId(id)
                 .orElseThrow(() -> new ClienteNotExistException("Cliente no encontrado"));
-        return ResponseEntity.ok(cliente); // Retorna la entidad con las listas pobladas por Feign
+        return ResponseEntity.ok(cliente);
     }
 
     @Operation(
@@ -94,10 +94,22 @@ public class ClienteController {
     @ApiResponse(responseCode = "404", description = "Cliente no encontrado")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarCliente(
-            @Parameter(description = "ID único del cliente a eliminar", example = "1")
+            @Parameter(description = "ID único del cliente a eliminar (Ejemplo: 30)", example = "30")
             @PathVariable Long id
     ) {
         clienteService.eliminarCliente(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Buscar clientes por apellido",
+            description = "Filtra de manera personalizada los clientes cuyo apellido contenga el texto ingresado."
+    )
+    @GetMapping("/buscar")
+    public ResponseEntity<List<Cliente>> buscarClientesPorApellido(
+            @io.swagger.v3.oas.annotations.Parameter(description = "Apellido o parte de él", example = "Ugarte")
+            @RequestParam String apellido
+    ) {
+        return ResponseEntity.ok(clienteService.buscarPorApellido(apellido));
     }
 }

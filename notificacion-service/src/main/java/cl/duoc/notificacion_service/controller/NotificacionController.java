@@ -1,14 +1,9 @@
 package cl.duoc.notificacion_service.controller;
 
-import cl.duoc.notificacion_service.exception.NotificacionNotExistException;
 import cl.duoc.notificacion_service.model.Notificacion;
 import cl.duoc.notificacion_service.service.NotificacionService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -31,98 +26,52 @@ public class NotificacionController {
         this.notificacionService = notificacionService;
     }
 
-    @Operation(
-            summary = "Listar notificaciones",
-            description = "Obtiene el listado completo de notificaciones registradas."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Notificaciones listadas correctamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = Notificacion.class))
-            )
-    )
-    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    @Operation(summary = "Listar notificaciones", description = "Obtiene el listado completo de notificaciones del sistema.")
     @GetMapping
-    public ResponseEntity<List<Notificacion>> obtenerNotificaciones() {
-        List<Notificacion> notificaciones = notificacionService.obtenerNotificaciones();
-        return ResponseEntity.ok(notificaciones);
+    public ResponseEntity<List<Notificacion>> listarNotificaciones() {
+        // NOTA: Si en tu NotificacionService el método se llama ligeramente distinto,
+        // ej: obtenerTodasNotificaciones() o listar(), ajusta el nombre aquí abajo.
+        return ResponseEntity.ok(notificacionService.obtenerTodasNotificaciones());
     }
 
-    // <-- NUEVO ENDPOINT PARA EL PUNTO 2 (Sincrónico con Feign)
-    @Operation(
-            summary = "Obtener por Usuario ID",
-            description = "Obtiene todas las notificaciones enviadas a un usuario específico."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Notificaciones del usuario obtenidas con éxito",
-            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Notificacion.class)))
-    )
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Notificacion>> obtenerNotificacionesPorUsuarioId(
-            @Parameter(description = "ID del usuario/cliente a consultar", example = "1")
-            @PathVariable Long usuarioId
-    ) {
-
-        List<Notificacion> notificaciones = notificacionService.obtenerNotificacionesPorUsuarioId(usuarioId);
-        return ResponseEntity.ok(notificaciones);
-    }
-
-    @Operation(
-            summary = "Obtener notificación",
-            description = "Obtiene una notificación mediante su ID."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Notificación encontrada correctamente",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Notificacion.class))
-    )
-    @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
-    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    @GetMapping("/{id}")
-    public ResponseEntity<Notificacion> obtenerNotificacionPorId(
-            @Parameter(description = "ID único de la notificación a buscar", example = "1")
-            @PathVariable Long id
-    ) {
-        Notificacion notificacion = notificacionService.buscarNotificacionPorId(id);
-        if (notificacion == null) {
-            throw new NotificacionNotExistException("Notificación no encontrada");
-        }
-        return ResponseEntity.ok(notificacion);
-    }
-
-    @Operation(
-            summary = "Crear notificación",
-            description = "Registra una nueva notificación en el sistema."
-    )
-    @ApiResponse(
-            responseCode = "201",
-            description = "Notificación creada correctamente",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Notificacion.class))
-    )
-    @ApiResponse(responseCode = "400", description = "Datos inválidos")
-    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    @Operation(summary = "Crear notificación", description = "Registra una nueva notificación en el sistema.")
     @PostMapping
-    public ResponseEntity<Notificacion> crearNotificacion(@RequestBody Notificacion notificacion) {
-        Notificacion nuevaNotificacion = notificacionService.guardarNotificacion(notificacion);
-        return new ResponseEntity<>(nuevaNotificacion, HttpStatus.CREATED);
+    public ResponseEntity<Notificacion> guardarNotificacion(@RequestBody Notificacion notificacion) {
+        Notificacion nueva = notificacionService.guardarNotificacion(notificacion);
+        return new ResponseEntity<>(nueva, HttpStatus.CREATED);
     }
 
-    @Operation(
-            summary = "Eliminar notificación",
-            description = "Elimina una notificación mediante su ID."
-    )
-    @ApiResponse(responseCode = "204", description = "Notificación eliminada correctamente")
-    @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
-    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    @Operation(summary = "Eliminar notificación", description = "Elimina una notificación del sistema usando su ID.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarNotificacion(
-            @Parameter(description = "ID de la notificación a eliminar", example = "1")
+            @Parameter(description = "ID único de la notificación a eliminar", example = "1")
             @PathVariable Long id
     ) {
         notificacionService.eliminarNotificacion(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Obtener notificaciones por Usuario ID",
+            description = "Busca la lista de notificaciones asociadas a un ID de usuario específico en el sistema."
+    )
+    @GetMapping("/usuario/{id}")
+    public ResponseEntity<List<Notificacion>> obtenerNotificacionesPorUsuario(
+            @Parameter(description = "ID único del usuario para buscar su historial", example = "30")
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(notificacionService.obtenerNotificacionesPorUsuarioId(id));
+    }
+
+    @Operation(
+            summary = "Filtrar notificaciones por tipo (Personalizado)",
+            description = "Endpoint personalizado para listar notificaciones filtradas por su tipo de envío (Email o SMS)."
+    )
+    @GetMapping("/filtrar/tipo")
+    public ResponseEntity<List<Notificacion>> filtrarPorTipo(
+            @Parameter(description = "Tipo o medio de notificación", example = "Email")
+            @RequestParam String tipo
+    ) {
+        return ResponseEntity.ok(notificacionService.buscarPorTipo(tipo));
     }
 }
