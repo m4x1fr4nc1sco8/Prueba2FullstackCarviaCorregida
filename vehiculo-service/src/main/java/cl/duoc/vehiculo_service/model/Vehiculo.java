@@ -66,7 +66,6 @@ public class Vehiculo {
     @io.swagger.v3.oas.annotations.media.Schema(hidden = true)
     private SeguroDTO seguro;
 
-    @com.fasterxml.jackson.annotation.JsonIgnore
     @Transient
     @io.swagger.v3.oas.annotations.media.Schema(hidden = true)
     private List<MantencionDTO> mantenciones;

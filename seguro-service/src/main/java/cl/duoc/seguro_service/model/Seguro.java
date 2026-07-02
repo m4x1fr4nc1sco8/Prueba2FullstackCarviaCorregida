@@ -1,6 +1,5 @@
 package cl.duoc.seguro_service.model;
 
-import cl.duoc.seguro_service.dto.VehiculoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -53,10 +52,5 @@ public class Seguro {
     @Size(max = 30,
             message = "El estado del seguro no puede superar los 30 caracteres")
     private String estadoSeguro;
-
-
-    @Transient
-    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"seguro", "vehiculos"}) // 🔥 AGREGA ESTO AQUÍ
-    private List<VehiculoDTO> vehiculos;
 
 }

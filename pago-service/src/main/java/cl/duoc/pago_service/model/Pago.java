@@ -51,5 +51,6 @@ public class Pago {
     private String estadoPago;
 
     @Transient
+    @io.swagger.v3.oas.annotations.media.Schema(hidden = true)
     private List<ClienteDTO> clientes;
 }

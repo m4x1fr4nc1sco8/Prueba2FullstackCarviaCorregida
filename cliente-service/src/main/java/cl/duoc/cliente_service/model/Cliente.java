@@ -44,9 +44,12 @@ public class Cliente {
     )
     private String telefono;
 
+
     @Transient
+    @io.swagger.v3.oas.annotations.media.Schema(hidden = true)
     private List<PagoDTO> pagos;
 
     @Transient
+    @io.swagger.v3.oas.annotations.media.Schema(hidden = true)
     private List<NotificacionDTO> notificaciones;
 }

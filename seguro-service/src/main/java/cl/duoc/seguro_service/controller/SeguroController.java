@@ -3,8 +3,6 @@ package cl.duoc.seguro_service.controller;
 import cl.duoc.seguro_service.exception.SeguroNotExistException;
 import cl.duoc.seguro_service.model.Seguro;
 import cl.duoc.seguro_service.service.SeguroService;
-import cl.duoc.seguro_service.feign.VehiculoFeignClient; // <-- Importación del cliente Feign
-import cl.duoc.seguro_service.dto.VehiculoDTO; // <-- Importación del DTO del Vehículo
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired; // <-- Para inyectar Feign
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +26,6 @@ import java.util.List;
 public class SeguroController {
 
     private final SeguroService seguroService;
-
-    @Autowired
-    private VehiculoFeignClient vehiculoFeignClient; // <-- Inyectamos Feign en el Controller
 
     public SeguroController(SeguroService seguroService) {
         this.seguroService = seguroService;
@@ -58,7 +52,7 @@ public class SeguroController {
 
     @Operation(
             summary = "Obtener seguro",
-            description = "Obtiene un seguro mediante su ID y consulta en red los datos de su vehículo."
+            description = "Obtiene un seguro mediante su ID."
     )
     @ApiResponse(
             responseCode = "200",
@@ -72,24 +66,10 @@ public class SeguroController {
             @Parameter(description = "ID único del seguro a buscar", example = "1")
             @PathVariable Long id
     ) {
-        // 1. Llamamos a tu servicio original (Devuelve entidad Seguro, todo en verde en tus Tests)
         Seguro seguro = seguroService.buscarSeguroPorId(id);
         if (seguro == null) {
             throw new SeguroNotExistException("Seguro no encontrado");
         }
-
-// 2. Buscamos el vehiculo mediante Feign Client y se lo asignamos al objeto antes de responder
-        if (seguro.getVehiculoId() != null) {
-            try {
-                VehiculoDTO vehiculo = vehiculoFeignClient.obtenerVehiculoPorId(seguro.getVehiculoId());
-
-                seguro.setVehiculos(java.util.List.of(vehiculo));
-            } catch (Exception e) {
-
-                seguro.setVehiculos(null);
-            }
-        }
-
         return ResponseEntity.ok(seguro);
     }
 
@@ -118,8 +98,14 @@ public class SeguroController {
             responseCode = "204",
             description = "Seguro eliminado correctamente"
     )
-    @ApiResponse(responseCode = "404", description = "Seguro no encontrado")
-    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    @ApiResponse(
+            responseCode = "404",
+            description = "Seguro no encontrado"
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Error interno del servidor"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarSeguro(
             @Parameter(description = "ID del seguro a eliminar", example = "1")
@@ -142,15 +128,6 @@ public class SeguroController {
         if (seguro == null) {
             return ResponseEntity.notFound().build();
         }
-
-        // Inyectamos también los datos aquí si se busca directamente por el ID del auto
-        try {
-            VehiculoDTO vehiculo = vehiculoFeignClient.obtenerVehiculoPorId(vehiculoId);
-            seguro.setVehiculos(java.util.List.of(vehiculo));
-        } catch (Exception e) {
-            seguro.setVehiculos(null);
-        }
-
         return ResponseEntity.ok(seguro);
     }
 }

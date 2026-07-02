@@ -49,5 +49,6 @@ public class Notificacion {
     private String estadoNotificacion;
 
     @Transient
+    @io.swagger.v3.oas.annotations.media.Schema(hidden = true)
     private List<ClienteDTO> clientes;
 }
